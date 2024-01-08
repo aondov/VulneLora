@@ -23,12 +23,22 @@ cd /opt/vulnelora
 git clone https://github.com/aondov/VulneLora.git
 ```
 
-Run initial_setup.sh script in setup_scripts directory:
+Move all files from cloned directory to own VulneLora directory and remove the cloned directory:
+
+***Note**: Be very careful when using the "rm -rf" command, as it can permanently delete files and/or directories which are given as an argument.*
 ```
-cd setup_files/
+mv /opt/vulnelora/VulneLora/* /opt/vulnelora
+rm -rf /opt/vulnelora/VulneLora
+```
+
+Run *initial_setup.sh* script in the *setup_files/* directory:
+```
+cd /opt/vulnelora/setup_files/
 chmod +x initial_setup.sh
-./initial_setup.sh
+sudo ./initial_setup.sh
 ```
+
+If the installation process is successful, the script will notify you and you can start using the VulneLora tool. If you encounter any errors, try to re-run the script first, before examining the error in detail.
 
 ## Usage
 VulneLora can be started using following command (and its arguments):
