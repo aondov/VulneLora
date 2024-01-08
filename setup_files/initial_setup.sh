@@ -27,7 +27,7 @@ done < "$services_file"
 # Service alias
 touch /usr/local/bin/vulnelora
 chmod +x /usr/local/bin/vulnelora
-echo -ne '#!/bin/bash\npython3 /opt/vulnelora/vulnelora_main.py "@"' > /usr/local/bin/vulnelora
+echo -ne '#!/bin/bash\npython3 /opt/vulnelora/vulnelora_main.py $@' > /usr/local/bin/vulnelora
 
 
 # Service installation result check
