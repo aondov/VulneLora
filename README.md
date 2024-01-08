@@ -31,9 +31,9 @@ chmod +x initial_setup.sh
 ```
 
 ## Usage
-VulneLora is still in development, therefore it does not offer any functionality now. However, it is possible to test the main menu.
+VulneLora can be started using following command (and its arguments):
 
-vulnelora [-h] [-G | -S | -C]
+vulnelora [-h] [ -G | -S | -C ]
 
 Optional arguments:
 - **-h, --help** - Show help message and exit
@@ -43,7 +43,7 @@ Optional arguments:
 
 ## Features
 - **main menu** - user can choose between 3 startup modes:
-1. Interactive mode - user configures the attacks using simple GUI, where specific parameters are set via command "*SET <variable-name> = <value>*"
+1. Interactive mode - user configures the attacks using simple GUI, where specific parameters are set via command "*SET &lt;variable-name&ht; = &lt;value&ht;*"
 2. Simulation mode - user runs the *lora-ap-sim* [1] simulator, which simulates LoRa@FIIT gateway and end devices (for testing purposes)
 3. Command line mode - user configures the attacks using traditional command line arguments and runs the attack as so called "one-liner"
 - **automatized installation** - VulneLora has its own installation script, which installs the VulneLora tool and prepares all necessary requirements to use it properly
