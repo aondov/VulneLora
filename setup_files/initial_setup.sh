@@ -27,7 +27,7 @@ done < "$services_file"
 # Service alias
 touch /usr/local/bin/vulnelora
 chmod +x /usr/local/bin/vulnelora
-echo '#!/bin/bash\npython3 /opt/vulnelora/vulnelora_main.py "@"' > /usr/local/bin/vulnelora
+echo -ne '#!/bin/bash\npython3 /opt/vulnelora/vulnelora_main.py "@"' > /usr/local/bin/vulnelora
 
 
 # Service installation result check
@@ -44,7 +44,6 @@ if [ -s "$file_path" ]; then
 		echo "[ERROR]: VulneLora service does not have executable permissions. Please, assign them manually in /usr/local/bin/"
 		err_flag=1
 	fi
-
 else
 	if [ -e "$file_path" ]; then
 		echo "[ERROR]: VulneLora service file exists but is empty. Try to re-run this script."
@@ -54,13 +53,11 @@ else
 	err_flag=1
 fi
 
-# err_flag=1
 
-if [ "err_flag" == "0" ]; then
+if [ "$err_flag" -eq 0 ]; then
 	echo "[SUCCESS]: VulneLora installed successfully!"
 	exit 0
 else
 	echo "[FAILED]: VulneLora installation encountered some errors. Try to re-run this script."
 	exit 1
 fi
-
