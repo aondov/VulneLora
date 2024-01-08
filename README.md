@@ -43,7 +43,7 @@ Optional arguments:
 
 ## Features
 - **main menu** - user can choose between 3 startup modes:
-1. Interactive mode - user configures the attacks using simple GUI, where specific parameters are set via command "*SET &lt;variable-name&ht; = &lt;value&ht;*"
+1. Interactive mode - user configures the attacks using simple GUI, where specific parameters are set via command "*SET &lt;variable-name&gt; = &lt;value&gt;*"
 2. Simulation mode - user runs the *lora-ap-sim* [1] simulator, which simulates LoRa@FIIT gateway and end devices (for testing purposes)
 3. Command line mode - user configures the attacks using traditional command line arguments and runs the attack as so called "one-liner"
 - **automatized installation** - VulneLora has its own installation script, which installs the VulneLora tool and prepares all necessary requirements to use it properly
