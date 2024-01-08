@@ -5,7 +5,7 @@ import subprocess
 import sys
 import os
 
-local_path = os.getcwd()
+local_path = "/opt/vulnelora"
 
 def print_line():
 	print(55*'_'+'\n')
