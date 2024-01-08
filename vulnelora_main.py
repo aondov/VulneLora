@@ -12,8 +12,13 @@ def print_line():
 
 
 def argument_parser(help_only):
+	class CustomHelpFormatter(argparse.HelpFormatter):
+		def _format_usage(self, usage, actions, groups, prefix):
+			usage = super()._format_usage(usage, actions, groups, prefix)
+			return usage.replace('vulnelora_main.py', 'vulnelora')
+
 	# Initialize the parser
-	parser = argparse.ArgumentParser(description='Vulnerability assessment tool for LoRa technology and LoRa@FIIT protocol.', formatter_class=argparse.RawTextHelpFormatter)
+	parser = argparse.ArgumentParser(description='Vulnerability assessment tool for LoRa technology and LoRa@FIIT protocol.', formatter_class=CustomHelpFormatter)
 
 	group = parser.add_mutually_exclusive_group()
 
