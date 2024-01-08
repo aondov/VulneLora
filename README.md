@@ -33,6 +33,8 @@ chmod +x initial_setup.sh
 ## Usage
 VulneLora is still in development, therefore it does not offer any functionality now. However, it is possible to test the main menu.
 
+vulnelora [-h] [-G | -S | -C]
+
 Optional arguments:
 - **-h, --help** - Show help message and exit
 - **-G** - Run VulneLora in the interactive mode
