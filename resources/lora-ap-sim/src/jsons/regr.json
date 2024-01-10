@@ -1,0 +1,16 @@
+{
+  "message_name":"REGR",
+  "message_body":{
+    "band": 125000,
+    "cr": "4/5",
+    "dev_id":"QUFB",
+    "power":14,
+    "duty_c": 36000,
+    "rssi": -57.0,
+    "sf": 9,
+    "snr": 10.75,
+    "time": 15752,
+    "app_data":"TE9SQUZJSVQ=",
+    "sh_key":"+/////v////7////+////wIAAAA="
+  }
+}

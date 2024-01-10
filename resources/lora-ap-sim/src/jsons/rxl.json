@@ -1,0 +1,18 @@
+{
+  "message_name":"RXL",
+  "message_body": {
+    "dev_id":"KmoT",
+    "seq":1,
+    "power":14,
+    "ack":"UNSUPPORTED",
+    "duty_c":3062.0,
+    "time":538.0,
+    "conf_need":false,
+    "band":125000,
+    "snr":11.59,
+    "rssi":-93.2,
+    "cr":"4/5",
+    "data":"MTQ1LDEwMA==",
+    "sf":7
+  }
+}

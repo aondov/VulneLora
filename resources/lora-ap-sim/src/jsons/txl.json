@@ -1,0 +1,15 @@
+{
+  "message_name":"TXL",
+  "message_body":{
+    "power":15,
+    "app_data":"",
+    "net_data":[
+      {
+        "sf":11,
+        "power":15,
+        "type":"NORMAL"
+      }
+    ],
+    "dev_id":"mc5V"
+  }
+}
