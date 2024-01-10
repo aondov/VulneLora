@@ -38,7 +38,10 @@ def argument_parser(help_only):
 		if args.G:
 			subprocess.run(['python3', local_path + '/modes/vulnelora_interactive.py'])
 		if args.S:
-			subprocess.run(['python3', local_path + '/modes/vulnelora_simulation.py'])
+			try:
+				subprocess.run(['python3', local_path + '/modes/vulnelora_simulation.py'])
+			except KeyboardInterrupt:
+				exit(0)
 		if args.C:
 			subprocess.run(['python3', local_path + '/modes/vulnelora_cmd_line.py'])
 		if unknown_args:
