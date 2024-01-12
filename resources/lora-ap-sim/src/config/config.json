@@ -12,7 +12,7 @@
     },
     "if_chain": 5,
     "rssi_offset": -166.0,
-    "server_address": "147.175.149.229:25001"
+    "server_address": "192.168.90.147:8002"
   },
   "tx_luts":[
     {

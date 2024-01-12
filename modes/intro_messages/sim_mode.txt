@@ -1,11 +1,7 @@
 You are now entering VulneLora Simulation mode...
 
-In this mode, you can generate a specific amount of end nodes and access points which utilize the LoRa@FIIT protocol.
+In this mode, you can generate a single access point and specific amount of end nodes which utilize the LoRa@FIIT protocol.
 Generated devices then simulate the communication process via the LoRa@FIIT protocol.
 
-Before you start the simulator, it is required to specify the amount of end nodes and access points to be generated.
-Also, it is recommended to read the help page of lora-ap-sim in order to know which arguments are supported.
-
-Supported arguments:
-
+It is recommended to read the help page of this mode in order to know which arguments are supported - type "help" for more information.
 

@@ -2,28 +2,41 @@
 
 import subprocess
 import os
+import json
 
 service_path = "/opt/vulnelora"
-sim_path = "/resources/lora-ap-sim/src"
-num_of_nodes = 0
-num_of_aps = 0
+sim_path = service_path + "/resources/lora-ap-sim/src"
 
 # sim_arguments
-args = {'register':0, 'bandit':0, 'dev_id':'123456', 'shuffle':0, 'node_path':""}
+args = {'server':"127.0.0.1",
+'port':8002,
+'register':0,
+'dev_id':"111111",
+'shuffle':0,
+'nodes':1,
+'node_path':"",
+'node_conf':{
+	'rssi':"",
+	'snr':"",
+	'freq':"",
+	'payload':"",
+	'sf':"",
+	'distance':""
+	}
+}
 
 
-def value_validator(value,type):
-	upper_value = 1
+def print_args():
+	formatted_args = json.dumps(args, indent=4)
+	print(formatted_args)
 
-	if type == "node":
-		upper_value = 500
-	elif type == "ap":
-		upper_value = 5
+
+def nodes_validator(value):
+	upper_value = 500
 
 	try:
 		int_value = int(value)
 		if 1 <= int_value <= upper_value:
-			# print(f"Input fits within the range (1-{upper_value}).")
 			return 0
 		else:
 			print(f"\n[ERROR]: Number of end nodes can only be within the range 1-{upper_value}. Please, try again.")
@@ -44,7 +57,7 @@ def replace_line(file_path, search_string, replace_string):
 	found = False
 	for i, line in enumerate(lines):
 		if search_string in line:
-			lines[i+1] = replace_string + '\n'  # Replacing the line with the new string
+			lines[i+1] = replace_string + '\n'
 			found = True
 			break
 
@@ -56,45 +69,65 @@ def replace_line(file_path, search_string, replace_string):
 
 
 def check_node_generator():
-	with open(service_path + sim_path + "/data/group.txt", 'r') as file:
+	with open(sim_path + "/data/group.txt", 'r') as file:
 		line_count = sum(1 for line in file)
 
-	if line_count == int(num_of_nodes):
-		return 0
-	else:
-		return 1
+	return line_count == int(args['nodes'])
+
 
 def validate_dev_id(value):
-	dev_id_val = value[len('dev_id')+1:].strip().lower()
-	return len(dev_id_val) == 6 and all(c.isalnum() and c.lower() in 'abcdef0123456789' for c in dev_id_val)
+	return len(value) == 6 and all(c.isalnum() and c.lower() in 'abcdef0123456789' for c in value)
 
 
 def validate_node_path(value):
-	path_val = value[len('node_path')+1:].strip().lower()
-	if os.path.exists(path_val):
-		return os.path.getsize(path_val) > 0
+	if os.path.exists(value):
+		return os.path.getsize(value) > 0
 	else:
+		return 0
+
+
+def validate_port(value):
+	try:
+		int_port = int(value)
+		return (1 <= int_port <= 65535)
+	except ValueError:
+		print("[ERROR]: Port value must be in range 1-65535.")
 		return 0
 
 
 def extract(text, value):
-	return text[len(value)+1:].strip().lower()
+	return text[len(value)+1:].strip()
 
 
 def argument_parser():
 	while True:
-		print(f"\033[96m\nvulora_arg_parse>\033[0m ", end='')
+		print(f"\033[96m\nvulora_sim>\033[0m ", end='')
 		arg_input = input()
 
 		if "help" in arg_input:
-			print("""\n\tregister [true|false]\tEnable/disable end node register process
-\n\tshuffle [true|false]\tEnable/disable end node ID shuffle before start
-\n\tbandit [true|false]\tEnable/disable support for bandit nodes
-\n\tdev_id <dev_id_value>\tSet custom hardware ID for AP (default is 123456) - Allowed only hexadecimal characters
-\n\tnode_path <path>\tSet path to custom LoRa node ID file (default is '') - Allowed only existing and non-empty files
-\n\tprint\t\t\tPrint current argument configuration
-\n\tfinish\t\t\tFinalize the argument configuration
-\n\thelp\t\t\tPrint this help message""")
+			with open(service_path + '/modes/help_messages/sim_mode.txt', 'r') as file:
+				file_content = file.read()
+				print(file_content)
+		elif "nodes" in arg_input:
+			tmp_nodes_num = extract(arg_input,'nodes')
+			if not nodes_validator(tmp_nodes_num):
+				args['nodes'] = int(tmp_nodes_num)
+				print(f"\n>> Set argument: nodes={tmp_nodes_num}")
+			else:
+				args['nodes'] = 1
+				print("\n>> Set argument: nodes=1 (default value, validation failed)")
+		elif "server" in arg_input:
+			tmp_server_ip = extract(arg_input,'server')
+			args['server'] = tmp_server_ip
+			print(f"\n>> Set argument: server={tmp_server_ip}")
+		elif "port" in arg_input:
+			tmp_port = extract(arg_input,'port')
+			if validate_port(tmp_port):
+				args['port'] = int(tmp_port)
+				print(f"\n>> Set argument: port={tmp_port}")
+			else:
+				args['port'] = 8002
+				print("\n>> Set argument: port=8002 (default value, validation failed)")
 		elif "register" in arg_input:
 			if "register true" in arg_input:
 				args['register'] = 1
@@ -109,39 +142,78 @@ def argument_parser():
 			else:
 				args['shuffle'] = 0
 				print("\n>> Disabled argument: shuffle")
-		elif "bandit" in arg_input:
-			if "bandit true" in arg_input:
-				args['bandit'] = 1
-				print("\n>> Enabled argument: bandit")
-			else:
-				args['bandit'] = 0
-				print("\n>> Disabled argument: bandit")
 		elif "dev_id" in arg_input:
-			if validate_dev_id(arg_input):
-				tmp_dev_id = extract(arg_input,'dev_id')
+			tmp_dev_id = extract(arg_input,'dev_id')
+			if validate_dev_id(tmp_dev_id):
 				args['dev_id'] = tmp_dev_id
 				print(f"\n>> Set argument: dev_id={tmp_dev_id}")
 			else:
-				args['dev_id'] = '123456'
-				print("\n>> Set argument: dev_id=123456 (default value, validation failed)")
+				args['dev_id'] = '111111'
+				print("\n>> Set argument: dev_id=111111 (default value, validation failed)")
 		elif "node_path" in arg_input:
-			if validate_node_path(arg_input):
-				tmp_node_path = extract(arg_input,'node_path')
+			tmp_node_path = extract(arg_input,'node_path')
+			if validate_node_path(tmp_node_path):
 				args['node_path'] = tmp_node_path
 				print("\n>> Set argument: node_path={tmp_node_path}.")
 			else:
 				args['node_path'] = ""
 				print("\n>> Set argument: node_path='' (default value, validation failed)")
-		elif "print" in arg_input:
+		elif "node_conf" in arg_input:
+			if "node_conf rssi" in arg_input:
+				tmp_rssi = extract(arg_input,'node_conf rssi')
+				args['node_conf']['rssi'] = tmp_rssi
+			elif "node_conf snr" in arg_input:
+				tmp_snr = extract(arg_input,'node_conf snr')
+				args['node_conf']['snr'] = tmp_snr
+			elif "node_conf freq" in arg_input:
+				tmp_freq = extract(arg_input,'node_conf freq')
+				args['node_conf']['freq'] = tmp_freq
+			elif "node_conf dist" in arg_input:
+				tmp_dist = extract(arg_input,'node_conf dist')
+				args['node_conf']['distance'] = tmp_dist
+			elif "node_conf sf" in arg_input:
+				tmp_sf = extract(arg_input,'node_conf sf')
+				args['node_conf']['sf'] = tmp_sf
+			elif "node_conf payload" in arg_input:
+				tmp_payload = extract(arg_input,'node_conf payload')
+				args['node_conf']['payload'] = tmp_payload
+			else:
+				print("\n[ERROR]: Unknown end node configuration parameter. Type 'help' to see the supported parameters.")
+		elif arg_input == "print":
 			print("\n>> Current argument configuration:")
-			print(args)
-		elif "finish" in arg_input:
+			print_args()
+		elif arg_input == "finish":
 			print("\n>> Final argument configuration:")
-			print(args)
+			print_args()
 			print()
 			break
+		elif arg_input == "exit":
+			exit(0)
 		else:
 			print(f"\n[ERROR]: Unknown argument '{arg_input}'. Type 'help' to see the supported arguments.")
+
+
+def generate_sim_command():
+	replace_line(sim_path + '/generator.py', '# nodes_config_point', 'num_of_nodes = ' + str(args['nodes']))
+	replace_line(sim_path + '/main.py', '# server_conf_point', '    conn.connect(\"' + args['server'] + '\", ' + str(args['port']) + ')')
+	subprocess.run(['python3', sim_path + '/generator.py'])
+
+	if check_node_generator():
+		print("\n[SUCCESS]: End nodes generated successfully!\n")
+	else:
+		print("[ERROR]: There was a problem generating the specified amount of end nodes.\n")
+		exit(1)
+
+	final_command = "vulnelora -S -run \"-i " + args['dev_id']
+
+	if args['register'] == 1:
+		final_command = final_command + " -r"
+	if args['shuffle'] == 1:
+		final_command = final_command + " -s"
+	if args['node_path'] != "":
+		final_command = final_command + " -f " + args['node_path']
+
+	print("[SUCCESS]: Simulation configured, please run following command: " + final_command + "\"\n")
 
 
 with open(service_path + '/modes/intro_messages/sim_mode.txt', 'r') as file:
@@ -149,25 +221,8 @@ with open(service_path + '/modes/intro_messages/sim_mode.txt', 'r') as file:
 	print(file_content)
 
 try:
-	while True:
-		num_of_nodes = input("\n> Enter a number of nodes to be generated (1-500): ")
-		if not value_validator(num_of_nodes,"node"):
-			break
-
-	while True:
-		num_of_aps = input("\n> Enter a number of APs to be generated (1-5): ")
-		if not value_validator(num_of_aps,"ap"):
-			break
-
-	replace_line(service_path + sim_path + '/generator.py', '# nodes_config_point', 'num_of_nodes = ' + num_of_nodes)
-	subprocess.run(['python3', service_path + sim_path + '/generator.py'])
-
-	if not check_node_generator():
-		print("\n[SUCCESS]: End nodes generated successfully!\n")
-	else:
-		print("[ERROR]: There was a problem generating the specified amount of end nodes.\n")
-
 	argument_parser()
+	generate_sim_command()
 
 except KeyboardInterrupt:
 	print("\n\n[INFO]: VulneLora forced to quit by keyboard interrupt. Bye Bye!\n")

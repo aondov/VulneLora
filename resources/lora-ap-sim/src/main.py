@@ -57,7 +57,7 @@ def main(argv):
     register_nodes = False
     shuffle_nodes = False
     duty_cycle_na = 0
-    node_file = "data/group1.txt"
+    node_file = "/opt/vulnelora/resources/lora-ap-sim/src/data/group.txt"
     bandit_nodes = False
     algorithm = 'ucb'
     test_scenario = False
@@ -96,7 +96,8 @@ def main(argv):
             test_scenario = True
 
     # If there was an AP id defined
-    conn.connect('lora.fiit.stuba.sk', 25001)
+    # server_conf_point
+    conn.connect("192.168.90.147", 8002)
     access_point = AccessPoint(ap_id, conn)
     access_point.send_setr()
 

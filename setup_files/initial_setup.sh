@@ -20,14 +20,14 @@ if [ ! -f "$services_file" ]; then
 fi
 
 while IFS= read -r service; do
-    apt install -y "$service"
+    apt install "$service"
 done < "$services_file"
 
 
 # Service alias
 touch /usr/local/bin/vulnelora
 chmod +x /usr/local/bin/vulnelora
-echo -ne '#!/bin/bash\npython3 /opt/vulnelora/vulnelora_main.py "$@"\n' > /usr/local/bin/vulnelora
+echo -ne '#!/bin/bash\npython3 /opt/vulnelora/vulnelora_main.py "$@"' > /usr/local/bin/vulnelora
 
 
 # Service installation result check

@@ -170,10 +170,21 @@ class Node:
         heart_rate, config_type = self._calculate_heart_rate(config_type)
         sf, band, cr, power, freq = self._select_net_data(config_type)
 
+	# sf_conf_point
+        sf = 8
+        print("CUSTOM: This is SF: ", sf)
+
+	# freq_conf_point
+        freq = freq
+        print("CUSTOM: This is FREQ: ", freq)
+
+	# payload_conf_point
         app_data = LoRa.get_data(self.x, self.y)
         time_on_air = LoRa.calculate_time_on_air(len(app_data), sf, band, cr, 1)
 
+	# snr_conf_point
         snr = LoRa.get_snr()
+        print("CUSTOM: This is SNR: ", snr)
 
         # Check if there is remaining duty cycle, additionally perform refresh
         self.set_remaining_duty_cycle(time_on_air)
@@ -188,8 +199,12 @@ class Node:
             self.collisions += 1
             return None
 
+	# dist_conf_point
         distance = self._get_distance_in_km(MAX_X_POSITION / 2, MAX_Y_POSITION / 2)
+        print("CUSTOM: This is DIST: ", distance)
+	# rssi_conf_point
         rssi = LoRa.calculate_rssi(power, TRANS_ANT_GAIN, REC_ANT_GAIN, freq / 1000000, distance)
+        print("CUSTOM: This is RSSI: ", rssi)
 
         if rssi < -120:
             print(f"Node {self.dev_id}: RSSI two low to be demodulated")

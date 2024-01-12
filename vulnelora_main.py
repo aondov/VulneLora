@@ -27,6 +27,8 @@ def argument_parser(help_only):
 	group.add_argument('-S', action='store_true', help='Run VulneLora in the simulated mode')
 	group.add_argument('-C', action='store_true', help='Run VulneLora in the command line mode')
 
+	parser.add_argument('-run', nargs='?', help=argparse.SUPPRESS)
+
 	if help_only:
 		parser.print_help()
 	else:
@@ -34,18 +36,30 @@ def argument_parser(help_only):
 		# Parse the arguments
 		args, unknown_args = parser.parse_known_args()
 
-		# Check and handle specified options
-		if args.G:
-			subprocess.run(['python3', local_path + '/modes/vulnelora_interactive.py'])
-		if args.S:
-			try:
-				subprocess.run(['python3', local_path + '/modes/vulnelora_simulation.py'])
-			except KeyboardInterrupt:
-				exit(0)
-		if args.C:
-			subprocess.run(['python3', local_path + '/modes/vulnelora_cmd_line.py'])
-		if unknown_args:
-			print(f"Error: Unrecognized argument(s): {' '.join(unknown_args)}\n")
+		try:
+			# Check and handle specified options
+			if args.G:
+				if not args.run:
+					subprocess.run(['python3', local_path + '/modes/vulnelora_interactive.py'])
+				else:
+					subprocess.run(['python3', args.run])
+			if args.S:
+				if args.run:
+					command = "python3 " + local_path + "/resources/lora-ap-sim/src/main.py"
+					conf_args = ''.join(args.run)
+					command = command + " " + conf_args
+					subprocess.run(command, shell=True)
+				else:
+					subprocess.run(['python3', local_path + '/modes/vulnelora_simulation.py'])
+			if args.C:
+				if not args.run:
+					subprocess.run(['python3', local_path + '/modes/vulnelora_cmd_line.py'])
+				else:
+					subprocess.run(['python3', str(args.run)])
+			if unknown_args:
+				print(f"Error: Unrecognized argument(s): {' '.join(unknown_args)}\n")
+		except KeyboardInterrupt:
+			exit(0)
 
 
 # Read and print the contents of the text file

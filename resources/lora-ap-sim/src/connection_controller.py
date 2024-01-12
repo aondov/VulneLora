@@ -1,5 +1,8 @@
 import socket
 import ssl
+from signal import signal, SIGPIPE, SIG_DFL
+
+signal(SIGPIPE,SIG_DFL)
 
 
 class ConnectionController:
