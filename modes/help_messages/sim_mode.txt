@@ -18,14 +18,22 @@
 
 	node_conf <parameter> <value>	Set custom values to different LoRa communication parameters
 					
-					Allowed parameters: 
-					rssi
-					snr	(min. -20 dB, max. +10 dB)
-					sf	(supported values: 7, 8, 9, 10, 11, 12)
-					dist
-					freq	(supported only "868.x" values)
-					payload	(max. 255 characters)
+					
+					Allowed parameters (input only values without unit names): 
+					
+					rssi  ------->	< -120 ; -1 > dB
+
+					snr  -------->	< -20 ; 10 > dB
+
+					sf  --------->	[7, 8, 9, 10, 11, 12]
+
+					dist  ------->	< 1 ; 100 > km
+
+					freq  ------->	(allowed format "868.xyz" or "866.xyz", e.g. "866.123")
+
+					payload  ---->	< 1 ; 255 > characters
 	
+
 	print  ---------------------->	Print current argument configuration
 
 	finish  --------------------->	Finalize the argument configuration and generate simulation command

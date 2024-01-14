@@ -97,7 +97,7 @@ def main(argv):
 
     # If there was an AP id defined
     # server_conf_point
-    conn.connect("192.168.90.147", 8002)
+    conn.connect("127.0.0.1", 8002)
     access_point = AccessPoint(ap_id, conn)
     access_point.send_setr()
 
