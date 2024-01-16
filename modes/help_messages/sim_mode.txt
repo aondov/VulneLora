@@ -34,6 +34,10 @@
 					payload  ---->	< 1 ; 255 > characters
 	
 
+	save <path>  ---------------->	Save current argument configuration to a specified path (including file name!)
+	
+	load <path>  ---------------->	Load argument configuration from a specified path (including file name!)
+	
 	print  ---------------------->	Print current argument configuration
 
 	finish  --------------------->	Finalize the argument configuration and generate simulation command

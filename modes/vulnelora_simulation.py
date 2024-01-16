@@ -7,6 +7,7 @@ import re
 
 service_path = "/opt/vulnelora"
 sim_path = service_path + "/resources/lora-ap-sim/src"
+save_flag = 0
 
 # sim_arguments
 args = {'server':"127.0.0.1",
@@ -25,6 +26,21 @@ args = {'server':"127.0.0.1",
 	'distance':""
 	}
 }
+
+
+def check_save():
+	if save_flag == 0:
+		print("\n>> Current configuration not saved, would you like to save it? [y/n] ", end='')
+		save_req = input()
+
+		if save_req.strip().lower() == "y":
+			print("\n>> Enter path (including file name) where the configuration should be saved: ", end='')
+			path = input()
+			save_conf(path)
+		elif save_req.strip().lower() == "n":
+			pass
+		else:
+			print("\n>> Valid answers are 'y' or 'n'. Any other answers are interpreted same as 'n'.")
 
 
 def stop_sim(reset_only, ret_value):
@@ -60,6 +76,7 @@ def nodes_validator(value):
 		return 1
 	except Exception as e:
 		print("[ERROR]: An unexpected error occured: ", e)
+		check_save()
 		stop_sim(False, 1)
 
 
@@ -135,6 +152,24 @@ def node_conf_validator(conf_type, value):
 			return 0
 	else:
 		return 0
+
+
+def save_conf(path):
+	with open(path, 'w') as file_w:
+		json.dump(args, file_w)
+	with open(path, 'r') as file_r:
+		file_content = json.load(file_r)
+		if file_content == args:
+			global save_flag
+			save_flag = 1
+			print(f"\n>> [SUCCESS]: Current configuration saved successfully in '{path}'!")
+		else:
+			print("\n>> [ERROR]: Configuration has not beed saved correctly due to unknown error. Please, try again.")
+
+
+def transfer_conf(loaded_conf):
+	global args
+	args.update(loaded_conf)
 
 
 def argument_parser():
@@ -247,6 +282,32 @@ def argument_parser():
 					print("\n>> Set node config: payload=\"\" (default value, validation failed)")
 			else:
 				print("\n[ERROR]: Unknown end node configuration parameter. Type 'help' to see the supported parameters.")
+		elif "save" in arg_input:
+			tmp_path = extract(arg_input, 'save')
+			if os.path.exists(tmp_path):
+				print("\n>> Path to save current configuration already exists. Overwrite? [y/n] ", end='')
+				overwrite = input()
+				if overwrite.strip().lower() == "y":
+					save_conf(tmp_path)
+				elif overwrite.strip().lower() == "n":
+					pass
+				else:
+					print("\n>> Valid answers are 'y' or 'n'. Any other answers are interpreted same as 'n'.")
+			else:
+				save_conf(tmp_path)
+		elif "load" in arg_input:
+			tmp_path = extract(arg_input, 'load')
+			if os.path.exists(tmp_path):
+				with open(tmp_path, 'r') as file:
+					file_content = json.load(file)
+					transfer_conf(file_content)
+					if args == file_content:
+						print("\n>> [SUCCESS]: Simulation configuration has been loaded successfully! Current argument configuration is:")
+						print_args()
+					else:
+						print("\n>> [ERROR]: Simulation configuration has not been loaded due to unknown error. Please, try again.")
+			else:
+				print("\n>> [ERROR]: File does not exist.")
 		elif arg_input == "print":
 			print("\n>> Current argument configuration:")
 			print_args()
@@ -254,8 +315,10 @@ def argument_parser():
 			print("\n>> Final argument configuration:")
 			print_args()
 			print()
+			check_save()
 			break
 		elif arg_input == "exit":
+			check_save()
 			stop_sim(False, 0)
 		else:
 			print(f"\n[ERROR]: Unknown argument '{arg_input}'. Type 'help' to see the supported arguments.")
@@ -284,6 +347,7 @@ def generate_sim_command():
 		print("\n[SUCCESS]: End nodes generated successfully!\n")
 	else:
 		print("[ERROR]: There was a problem generating the specified amount of end nodes.\n")
+		check_save()
 		stop_sim(False, 1)
 
 	final_command = "vulnelora -S -run \"-i " + args['dev_id']
