@@ -43,18 +43,21 @@ If the installation process is successful, the script will notify you and you ca
 ## Usage
 VulneLora can be started using following command (and its arguments):
 
-vulnelora [-h] [ -G | -S | -C ]
+vulnelora [-h] [ -I | -S | -C ]
 
 Optional arguments:
 - **-h, --help** - Show help message and exit
-- **-G** - Run VulneLora in the interactive mode
+- **-I** - Run VulneLora in the interactive mode
 - **-S** - Run VulneLora in the simulation mode
 - **-C** - Run VulneLora in the command line mode
 
 ## Features
 - **main menu** - user can choose between 3 startup modes:
-1. Interactive mode - user configures the attacks using simple GUI, where specific parameters are set via command "*SET &lt;variable-name&gt; = &lt;value&gt;*"
-2. Simulation mode
+1. Interactive mode
+  - user configures the attacks using simple GUI, where specific parameters are set via command "*SET &lt;variable-name&gt; = &lt;value&gt;*"
+  - program can upload an edited firmware LoMAB [2] (including the LoRa@FIIT library [3]) to an end device
+  - program can start pre-defined attacks (currently only 3 out of 6 attacks) - *in development*
+3. Simulation mode
   - user runs the *lora-ap-sim* [1] simulator, which simulates LoRa@FIIT gateway and end devices (for testing purposes)
   - user can configure the connection arguments, such as RSSI, SNR, frequency, spreading factor, etc.
   - user can configure a specific IP and port for the LoNES network server
@@ -64,7 +67,8 @@ Optional arguments:
 - **automatized installation** - VulneLora has its own installation script, which installs the VulneLora tool and prepares all necessary requirements to use it properly
 
 ## TODO
-- [ ] code every startup mode and test it
+- [ ] code command-line mode and test it
+- [x] code interactive mode and test it
 - [x] integrate *lora-ap-sim* [1] to VulneLora
 - [ ] implement the attacks on LoRa and LoRa@FIIT, regardless of the startup mode
 - [ ] create testing scenarios (acceptance tests)
@@ -72,3 +76,5 @@ Optional arguments:
 
 ## Sources
 [1] https://github.com/alexandervalach/lora-ap-sim.git
+[2] https://github.com/alexandervalach/LoMAB.git
+[3] https://github.com/loraalex/LoRaFIIT.git
