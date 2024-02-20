@@ -1,0 +1,7 @@
+You are now entering VulneLora Interactive mode...
+
+In this mode, you can run several attacks, targeting multiple parts of a traditional LoRa@FIIT infrastructure.
+Attacks are configured by interacting with the VulneLora program and setting the attack parameters.
+
+It is recommended to read the help page of the chosen attack in order to know which arguments are supported - type "help" after choosing the attack for more information.
+

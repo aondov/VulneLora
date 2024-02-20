@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 # Check sudo
 if [ "$(id -u)" != "0" ]; then
     echo -ne "\n[ERROR]: You need root privileges to run this script.\n"
@@ -19,9 +20,21 @@ if [ ! -f "$services_file" ]; then
     exit 1
 fi
 
-while IFS= read -r service; do
-    apt install "$service"
-done < "$services_file"
+
+# Install required python packages
+echo "[INFO]: Installing packages using pip..."
+pip install -r "$services_file" --ignore-installed 2>/dev/null
+echo "[SUCCESS]: Packages installed successfully."
+
+
+# Create a platformio binary alias to use it as a basic command
+platformio_cmd=$(find / -type f -iwholename "*/bin/platformio*" 2>/dev/null | head -n 1)
+if [ -n "$platformio_cmd" ]; then
+    echo "alias platformio='$platformio_cmd'" >> ~/.bashrc
+    echo "[SUCCESS]: Alias 'platformio' created successfully!"
+else
+    echo "[ERROR]: Platformio binary not found, it is recommended to create its alias manually in ~/.bashrc."
+fi
 
 
 # Service alias

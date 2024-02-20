@@ -8,7 +8,7 @@ import os
 local_path = "/opt/vulnelora"
 
 def print_line():
-	print(55*'_'+'\n')
+	print(50*'_'+'\n')
 
 
 def argument_parser(help_only):
@@ -23,7 +23,7 @@ def argument_parser(help_only):
 	group = parser.add_mutually_exclusive_group()
 
 	# Add arguments
-	group.add_argument('-G', action='store_true', help='Run VulneLora in the interactive mode')
+	group.add_argument('-I', action='store_true', help='Run VulneLora in the interactive mode')
 	group.add_argument('-S', action='store_true', help='Run VulneLora in the simulated mode')
 	group.add_argument('-C', action='store_true', help='Run VulneLora in the command line mode')
 
@@ -38,7 +38,7 @@ def argument_parser(help_only):
 
 		try:
 			# Check and handle specified options
-			if args.G:
+			if args.I:
 				if not args.run:
 					subprocess.run(['python3', local_path + '/modes/vulnelora_interactive.py'])
 				else:

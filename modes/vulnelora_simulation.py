@@ -294,7 +294,10 @@ def argument_parser():
 				else:
 					print("\n>> Valid answers are 'y' or 'n'. Any other answers are interpreted same as 'n'.")
 			else:
-				save_conf(tmp_path)
+				if tmp_path != "":
+					save_conf(tmp_path)
+				else:
+					print("\n>> [ERROR]: Attack configuration not saved. Please, input a valid path (including file name).")
 		elif "load" in arg_input:
 			tmp_path = extract(arg_input, 'load')
 			if os.path.exists(tmp_path):

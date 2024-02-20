@@ -6,7 +6,7 @@ import string
 dev_ids = []
 file_path = "/opt/vulnelora/resources/lora-ap-sim/src/data/group.txt"
 # nodes_config_point
-num_of_nodes = 1
+num_of_nodes = 3
 
 
 def generate_nodes(number_of_nodes=5, dev_id_length=4):
