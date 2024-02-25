@@ -31,18 +31,8 @@ pip install -r "$services_file" --ignore-installed 2>/dev/null
 echo "[SUCCESS]: Packages installed successfully."
 
 
-# Create a platformio binary alias to use it as a basic command
-#platformio_cmd=$(find / -type f -iwholename "*/bin/platformio*" 2>/dev/null | head -n 1)
-#if [ -n "$platformio_cmd" ]; then
-#    echo "alias platformio='$platformio_cmd'" >> ~/.bashrc
-#    echo "[SUCCESS]: Alias 'platformio' created successfully!"
-#else
-#    echo "[ERROR]: Platformio binary not found, it is recommended to create its alias manually in ~/.bashrc."
-#fi
-
-
 # Get device type
-cat /sys/firmware/devicetree/base/model > "$tool_path/setup_files/device.txt"
+cat /sys/firmware/devicetree/base/model > "$tool_path/setup_files/device_info"
 
 
 # Service alias
