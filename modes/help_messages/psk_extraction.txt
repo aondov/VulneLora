@@ -2,13 +2,13 @@
 
 	[COMMAND]			 [DESCRIPTION]
 
-	target_ip <ip>  ------------->  Set IP address of a target host
+	* target_ip <ip>  ----------->  Set IP address of a target host
 
-        target_port <port>  --------->  Set port of a target host (default is 22)
+        * target_port <port>  ------->  Set port of a target host (default is 22)
 
-	filename <string>  ---------->  Set a filename to look for on a target host
+	* filename <string>  -------->  Set a filename to look for on a target host
 
-	ssh_creds_path <path>  ------>  Set path to a credentials discovered with SSH exploit attack (REQUIRED)
+	* ssh_creds_path <path>  ---->  Set path to a credentials discovered with SSH exploit attack
 
 	try_sudo [true|false]  ------>  Try searching a specified file as sudo
 
@@ -25,3 +25,6 @@
 	help  ----------------------->	Print this help message
 
 	exit  ----------------------->	Exit VulneLora
+
+
+	[* mandatory]

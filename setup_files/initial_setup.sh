@@ -11,6 +11,10 @@ fi
 echo -ne "\nStarting VulneLora installation...\n\n"
 
 
+# Default vulnelora tool path
+tool_path="/opt/vulnelora"
+
+
 # Required services installation
 apt update
 services_file="/opt/vulnelora/setup_files/requirements.txt"
@@ -28,13 +32,17 @@ echo "[SUCCESS]: Packages installed successfully."
 
 
 # Create a platformio binary alias to use it as a basic command
-platformio_cmd=$(find / -type f -iwholename "*/bin/platformio*" 2>/dev/null | head -n 1)
-if [ -n "$platformio_cmd" ]; then
-    echo "alias platformio='$platformio_cmd'" >> ~/.bashrc
-    echo "[SUCCESS]: Alias 'platformio' created successfully!"
-else
-    echo "[ERROR]: Platformio binary not found, it is recommended to create its alias manually in ~/.bashrc."
-fi
+#platformio_cmd=$(find / -type f -iwholename "*/bin/platformio*" 2>/dev/null | head -n 1)
+#if [ -n "$platformio_cmd" ]; then
+#    echo "alias platformio='$platformio_cmd'" >> ~/.bashrc
+#    echo "[SUCCESS]: Alias 'platformio' created successfully!"
+#else
+#    echo "[ERROR]: Platformio binary not found, it is recommended to create its alias manually in ~/.bashrc."
+#fi
+
+
+# Get device type
+cat /sys/firmware/devicetree/base/model > "$tool_path/setup_files/device.txt"
 
 
 # Service alias

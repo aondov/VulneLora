@@ -2,15 +2,17 @@
 
 	[COMMAND]			[DESCRIPTION]
 
-	* username <username>  ------>  Set username for the SSH connection bruteforce attack (default is root)
+	command <string>  ----------->  Set SQL command to be send via SQL injection
 
-	* password_list <path>  ----->  Set path to a list of passwords for the SSH connection bruteforce attack
+	* db_ip <ip>  --------------->  Set IP address of the injected database
 
-	* target_ip <ip>  ----------->  Set IP address of a target host
+        * db_port <port>  ----------->  Set port of the injected database
 
-	* target_port <port>  ------->  Set port of a target host (default is 22)
+        * db_name <string>  --------->  Specify a name of the injected database
 
-	threads <num>  -------------->  Set the amount of concurrent threads to execute the bruteforce attack (default is 1, max. 10)
+	* db_user <string>  --------->  Set username to log in as
+
+        * db_pass <string>  --------->  Set password to log in as
 
 	save <path>  ---------------->	Save current attack configuration to a specified path (including file name!)
 	
