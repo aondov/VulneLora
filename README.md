@@ -5,10 +5,10 @@ Vulnerability assessment tool for LoRa technology and LoRa@FIIT protocol.
 
 Installation process of VulneLora is automatized and requires only few steps to finish.
 
-Firstly, install "git" and "python3":
+Firstly, install required packages:
 ```
 sudo apt update
-sudo apt install git python3
+sudo apt install git python3 postgresql-client platformio
 ```
 
 Create a directory in "/opt" and set the owner of this directory to the current user:
