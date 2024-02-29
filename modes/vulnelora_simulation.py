@@ -96,7 +96,7 @@ def replace_line(file_path, search_string, replace_string):
 		with open(file_path, 'w') as file:
 			file.writelines(lines)
 	else:
-		print("[ERROR]: There was a problem generating the specified amount of end nodes.")
+		print("[ERROR]: Could not change the specified parameter. Try again, please.")
 
 
 def check_node_generator():

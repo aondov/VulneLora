@@ -7,9 +7,36 @@ import subprocess
 save_flag = 0
 service_path = "/opt/vulnelora"
 lomab_dir = service_path + "/resources/LoMAB"
+sim_path = service_path + "/resources/lora-ap-sim/src"
 
 
-attack_config = {'payload': ""}
+attack_config = {'payload': "",
+'simulate': False,
+'server_ip': "127.0.0.1"
+}
+
+
+def replace_line(file_path, search_string, replace_string):
+    with open(file_path, 'r') as file:
+        lines = file.readlines()
+
+        found = False
+        for i, line in enumerate(lines):
+            if search_string in line:
+                lines[i+1] = replace_string + '\n'
+                found = True
+                break
+
+        if found:
+            with open(file_path, 'w') as file:
+                file.writelines(lines)
+        else:
+            print("[ERROR]: There was a problem generating the specified amount of end nodes.")
+
+
+def reset_sim():
+    replace_line(sim_path + '/node.py', '# payload_conf_point', '        app_data = LoRa.get_data(self.x, self.y)')
+    replace_line(sim_path + '/main.py', '# server_conf_point', '    conn.connect(\"127.0.0.1\", 8002)')
 
 
 def check_save():
@@ -81,6 +108,17 @@ def argument_parser():
             else:
                 attack_config['payload'] = ""
                 print(f"\n>> Set argument: payload='' (revert to default value, payload must be less than 255 characters)")
+        elif "simulate" in arg_input:
+            if "simulate true" in arg_input:
+                attack_config['simulate'] = True
+                print("\n>> Enable argument: simulate")
+            else:
+                attack_config['simulate'] = False
+                print("\n>> Disable argument: simulate")
+        elif "server_ip" in arg_input:
+            tmp_ip = extract(arg_input, "server_ip")
+            attack_config['server_ip'] = tmp_ip
+            print(f"\n>> Set argument: server_ip={tmp_ip}")
         elif arg_input == "print":
             print("\n>> Current argument configuration:")
             print_args()
@@ -121,6 +159,7 @@ def argument_parser():
             break
         elif arg_input == "exit":
             check_save()
+            reset_sim()
             exit(0)
         else:
             print(f"\n[ERROR]: Unknown argument '{arg_input}'. Type 'help' to see the supported arguments.")
@@ -151,8 +190,18 @@ def run_attack():
 
     print("\n[INFO]: Uploading the malicious firmware to the end device...\n")
 
-#    subprocess.run(["pio", "run", "-d", lomab_dir])
-#    subprocess.run(["pio", "run", "-d", lomab_dir, "-t", "upload"])
+    subprocess.run(["pio", "run", "-d", lomab_dir])
+    subprocess.run(["pio", "run", "-d", lomab_dir, "-t", "upload"])
+
+
+def simulate_attack():
+    replace_line(sim_path + '/generator.py', '# nodes_config_point', 'num_of_nodes = 1')
+    replace_line(sim_path + '/node.py', '# payload_conf_point', f'        app_data = \"{attack_config["payload"]}\"')
+    replace_line(sim_path + '/main.py', '# server_conf_point', f'    conn.connect(\"{attack_config["server_ip"]}\", 8002)')
+
+    print("\n[INFO]: Starting the simulated SQL injection attack from end device...\n")
+
+    print('vulnelora -S -run \"-i 123456 -r\"')
 
 
 def detect_device():
@@ -168,10 +217,15 @@ def detect_device():
 
 if __name__ == "__main__":
     try:
+        reset_sim()
         detect_device()
         argument_parser()
-        run_attack()
+        if attack_config['simulate']:
+            simulate_attack()
+        else:
+            run_attack()
     except KeyboardInterrupt:
+        reset_sim()
         exit(0)
 
     exit(0)

@@ -20,14 +20,11 @@ def load_attacks():
         loaded_attacks[f"{category}"] = {}
 
         files = os.listdir(f"{attacks_path}/{category}")
-        files.append('Quit VulneLora.py')
 
         for file in files:
             if file.endswith('.py'):
                 loaded_attacks[f"{category}"][str(index)] = f"{file}"
                 no_extension_file = os.path.splitext(file)[0]
-                if no_extension_file == "Quit VulneLora":
-                    print()
                 print(f"\t{str(index)}) {no_extension_file}")
                 index = index + 1
 
@@ -36,25 +33,26 @@ def main():
     curr_attack_path = ""
     print("\n>> Available attacks:")
     load_attacks()
+    print(f"\n\t99) Quit VulneLora")
     chosen_attack = ""
     print()
 
     option = input(">> Select the attack number:  ")
 
+    if option == "99":
+        exit()
+
     found = False
     for group, attacks_dict in loaded_attacks.items():
         if option in attacks_dict:
-            if int(option) == len(attacks_dict):
-                exit(0)
+            curr_attack_path = f"{attacks_path}/{group}/{attacks_dict[option]}"
+            if os.path.exists(curr_attack_path):
+                print(f"\n[SUCCESS]: Loaded attack: {attacks_dict[option]}\n")
+                chosen_attack = attacks_dict[option]
+                found = True
+                break
             else:
-                curr_attack_path = f"{attacks_path}/{group}/{attacks_dict[option]}"
-                if os.path.exists(curr_attack_path):
-                    print(f"\n[SUCCESS]: Loaded attack: {attacks_dict[option]}\n")
-                    chosen_attack = attacks_dict[option]
-                    found = True
-                    break
-                else:
-                    print("\n[ERROR]: Selected attack not found.\n")
+                print("\n[ERROR]: Could not find a source file for this attack.\n")
     if not found:
         print("\n[ERROR]: Attack number not found.\n")
         exit(1)

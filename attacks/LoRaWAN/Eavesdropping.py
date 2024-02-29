@@ -1,11 +1,14 @@
 import os
 import sys
 import json
+import csv
 import subprocess
+from pathlib import Path
 
 
 save_flag = 0
 service_path = "/opt/vulnelora"
+pkt_logger_path = "/opt/vulnelora/resources"
 
 
 attack_config = {'save_capture': False,
@@ -65,50 +68,41 @@ def transfer_conf(loaded_conf):
 
 
 def collect_logs():
-    print("\n [INFO]: Started collecting logs (stop with Ctrl+c)...\n")
-    output_file = f"{service_path}/resources/tmp_capture.log"
+    print("\n[INFO]: Started collecting logs (stop with Ctrl+c)...\n")
 
     try:
-        if not os.path.exists(output_file):
-            with open(output_file, 'w') as file:
-                file.write("")
-    except Exception as e:
-        print(e)
+        command = ['./util_pkt_logger']
 
-    try:
-        command = ['journalctl', '-u', 'packet_converter', '-f']
+        process = subprocess.Popen(command, cwd=pkt_logger_path, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-        with open(output_file, 'wb') as f:
-            for line in iter(process.stdout.readline, b''):
-                if '{"message_body":'.encode() in line:
-                    f.write(line)
-
+        return_code = process.wait()
     except KeyboardInterrupt:
-        print("\n\n [INFO]: Log collection stopped, starting analysis...\n")
+        print("\n\n[INFO]: Log collection stopped, starting analysis...\n")
         return
     except Exception as e:
-        print(f"[ERROR]: Unexpected error occurred: {str(e)}")
+        print(f"Error occurred: {str(e)}")
 
 
 def analyze_logs():
     json_logs = []
-    log_file = f"{service_path}/resources/tmp_capture.log"
+    content = ""
     record_counter = 1
 
-    try:
-        if not os.path.exists(log_file):
-            print("\n[ERROR]: Log file not found, capture some logs first")
-            return
-    except Exception as e:
-        print(e)
+    files = os.listdir(pkt_logger_path)
+    log_files = [file for file in files if file.startswith("pktlog_")]
 
-    with open(log_file, 'r') as logfile:
-        content = logfile.readlines()
+    if len(log_files) == 0:
+        print("[ERROR]: Possible error with concentrator. Try again, please.")
+        return
 
-        if len(content) == 0:
+    curr_logfile = log_files[0]
+
+    with open(f"{pkt_logger_path}/{curr_logfile}", 'r') as file_r:
+        content = file_r.readlines()
+
+        if len(content) <= 1:
             print("\n[ERROR]: No data captured, try again")
+            os.remove(f"{pkt_logger_path}/{curr_logfile}")
             return
 
         if attack_config['save_capture']:
@@ -123,35 +117,38 @@ def analyze_logs():
 
             print(f"\n[SUCCESS]: Captured data saved successfully in '{c_logfile}'!")
 
-    for entry in content:
-        json_str = entry.split(': ')[-1]
-        log_data = json.loads(json_str)
-        json_logs.append(log_data)
+    headers = content[0].split(',')
 
+    for line in content[1:]:
+        fields = line.split(',')
+        row_data = {header.strip().strip('\"'): field.strip().strip('\"') for header, field in zip(headers, fields)}
+        json_logs.append(row_data)
 
     for log in json_logs:
+        json_output = json.dumps(log, indent=4)
+        parsed_json = json.loads(json_output)
+
         print()
         print(20 * '#', end=' ')
         print(f"Message No. {record_counter}", end=' ')
         print(20 * '#')
 
-        if "REGR" in log['message_name']:
-            print(f"\n>> [INFO]: Caught REGISTRATION REQUEST data for device {log['message_body']['dev_id']}\n")
-        elif "REGA" in log['message_name']:
-            print(f"\n>> [INFO]: Caught REGISTRATION RESPONSE data for device {log['message_body']['dev_id']}\n")
-        elif "TXL" in log['message_name']:
-            print(f"\n>> [INFO]: Caught RECEIVED data for device {log['message_body']['dev_id']}\n")
-        elif "RXL" in log['message_name']:
-            print(f"\n>> [INFO]: Caught TRANSMITTED data for device {log['message_body']['dev_id']}\n")
-        elif "KEYS" in log['message_name']:
-            print(f"\n>> [INFO]: Caught KEYS data for device {log['message_body']['dev_id']}\n")
-        else:
-            print(f"\n>> [INFO]: Caught MISC data for device {log['message_body']['dev_id']}\n")
+        try:
+            hex_string = parsed_json['payload'][20:38].replace('-','')
+            byte_data = bytes.fromhex(hex_string)
 
-        print(json.dumps(log, indent=4))
+            formatted_bytes = ', '.join([f"0x{byte:02x}" for byte in byte_data])
+            print(f"\n[INFO]: Possible end device ID: {formatted_bytes}")
+        except IndexError:
+            print("\n[INFO]: Could not find any possible end device ID.")
+        except KeyError:
+            print("\n[INFO]: Current message does not include any payload.")
+        except Exception as e:
+            print(f"[ERROR]: Unexpected error occured: {str(e)}")
+
+        print()
+        print(json_output)
         record_counter = record_counter + 1
-
-    print()
 
     if attack_config['save_analysis']:
         a_logfile = attack_config['analysis_path']
@@ -168,17 +165,19 @@ def analyze_logs():
 
         print(f"\n[SUCCESS]: Analyzed data saved successfully in '{a_logfile}'!")
 
+    os.remove(f"{pkt_logger_path}/{curr_logfile}")
+
 
 def detect_service():
-    try:
-        result = subprocess.run(['systemctl', 'status', 'packet_converter.service'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    global pkt_logger_path
+    filename = "util_pkt_logger"
 
-        if result.returncode == 0 or result.returncode == 3:
+    for root, dirs, files in os.walk("/", topdown=True):
+        if filename in files:
+            file_path = os.path.join(root, filename)
+            pkt_logger_path = str(root)
             return True
-        else:
-            return False
-    except Exception as e:
-        print(e)
+    return False
 
 
 def argument_parser():
@@ -299,7 +298,7 @@ def argument_parser():
 if __name__ == "__main__":
     try:
         if not detect_service():
-            print("\n[ERROR]: Missing packet_converter service, cannot run this attack\n")
+            print("\n>> [ERROR]: Missing util_pkt_logger service, cannot run this attack")
             exit(1)
 
         argument_parser()
