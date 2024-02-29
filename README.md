@@ -60,7 +60,7 @@ Optional arguments:
   - user configures the attacks using simple GUI, where specific parameters are set via command "*SET &lt;variable-name&gt; = &lt;value&gt;*"
   - program can upload an edited firmware LoMAB [2] (including the LoRa@FIIT library [3]) to an end device
   - program can start pre-defined attacks (currently only 3 out of 6 attacks) - *in development*
-3. Simulation mode
+2. Simulation mode
   - user runs the *lora-ap-sim* [1] simulator, which simulates LoRa@FIIT gateway and end devices (for testing purposes)
   - user can configure the connection arguments, such as RSSI, SNR, frequency, spreading factor, etc.
   - user can configure a specific IP and port for the LoNES network server
