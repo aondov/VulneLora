@@ -51,6 +51,9 @@ Optional arguments:
 - **-S** - Run VulneLora in the simulation mode
 - **-C** - Run VulneLora in the command line mode
 
+## Requirements
+- *TODO*
+
 ## Features
 - **main menu** - user can choose between 3 startup modes:
 1. Interactive mode
@@ -63,18 +66,21 @@ Optional arguments:
   - user can configure a specific IP and port for the LoNES network server
   - user can configure a number of end nodes to be generated and simulated
   - user can save/load a running configuration in json format
-3. Command line mode - user configures the attacks using traditional command line arguments and runs the attack as so called "one-liner"
+3. ~~Command line mode - user configures the attacks using traditional command line arguments and runs the attack as so called "one-liner"~~
 - **automatized installation** - VulneLora has its own installation script, which installs the VulneLora tool and prepares all necessary requirements to use it properly
 
 ## TODO
-- [ ] code command-line mode and test it
+- [x] ~~code command-line mode and test it~~ *(not needed)*
 - [x] code interactive mode and test it
 - [x] integrate *lora-ap-sim* [1] to VulneLora
 - [ ] implement the attacks on LoRa and LoRa@FIIT, regardless of the startup mode
 - [ ] create testing scenarios (acceptance tests)
 - [ ] test the attacks, evaluate their results
+- [ ] add description for required packages to README (packet_converter, util_pkt_logger, etc.)
 
 ## Sources
 [1] https://github.com/alexandervalach/lora-ap-sim.git
+
 [2] https://github.com/alexandervalach/LoMAB.git
+
 [3] https://github.com/loraalex/LoRaFIIT.git
