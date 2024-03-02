@@ -90,7 +90,7 @@ def argument_parser():
                 print(f"\n>> Set argument: db_ip={tmp_ip}")
             else:
                 attack_config['db_ip'] = "127.0.0.1"
-                print("\n>> Set argument: db_ip='' (default value, must be a valid IP address)")
+                print("\n>> Set argument: db_ip='127.0.0.1' (default value, must be a valid IP address)")
         elif "db_port" in arg_input:
             tmp_port = extract(arg_input, "db_port")
             try:

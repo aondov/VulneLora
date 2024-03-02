@@ -104,6 +104,7 @@ def main(argv):
     if test_scenario:
         node_ids = ['KmoT', 'meQy', 'meBh', 'cbun', 'ttYa']
     else:
+        # node_id_conf_point
         node_ids = load_nodes(node_file)
 
     if shuffle_nodes:

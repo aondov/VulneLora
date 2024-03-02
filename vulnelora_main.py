@@ -5,7 +5,9 @@ import subprocess
 import sys
 import os
 
+
 local_path = "/opt/vulnelora"
+
 
 def print_line():
 	print(50*'_'+'\n')
@@ -25,7 +27,6 @@ def argument_parser(help_only):
 	# Add arguments
 	group.add_argument('-I', action='store_true', help='Run VulneLora in the interactive mode')
 	group.add_argument('-S', action='store_true', help='Run VulneLora in the simulated mode')
-	group.add_argument('-C', action='store_true', help='Run VulneLora in the command line mode')
 
 	parser.add_argument('-run', nargs='?', help=argparse.SUPPRESS)
 
@@ -51,11 +52,6 @@ def argument_parser(help_only):
 					subprocess.run(command, shell=True)
 				else:
 					subprocess.run(['python3', local_path + '/modes/vulnelora_simulation.py'])
-			if args.C:
-				if not args.run:
-					subprocess.run(['python3', local_path + '/modes/vulnelora_cmd_line.py'])
-				else:
-					subprocess.run(['python3', str(args.run)])
 			if unknown_args:
 				print(f"Error: Unrecognized argument(s): {' '.join(unknown_args)}\n")
 		except KeyboardInterrupt:
