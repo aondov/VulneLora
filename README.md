@@ -102,6 +102,7 @@ The device which will be using the VulneLora tool needs to be compatible with fo
 - [ ] test the attacks, evaluate their results
 - [x] add description for required packages to README (packet_converter, util_pkt_logger, etc.)
 - [x] add disclaimer
+- [ ] check if help messages correspond with actual attacks
 
 <br>
 
