@@ -10,9 +10,9 @@
 
 	* ssh_creds_path <path>  ---->  Set path to a credentials discovered with SSH exploit attack
 
-	try_sudo [true|false]  ------>  Try searching a specified file as sudo
+	try_sudo [true|false]  ------>  Enable/disable searching for a specified file as sudo
 
-	print_full [true|false]  ---->  Fully print every discovered file
+	print_full [true|false]  ---->  Enable/disable full print of every discovered file
 
 	save <path>  ---------------->	Save current attack configuration to a specified path (including file name!)
 	

@@ -3,16 +3,16 @@
 	[COMMAND]			[DESCRIPTION]
 
 	command <string>  ----------->  Set SQL command to be send via SQL injection
+ 
+	* db_ip <ip>  --------------->  Set IP address of the injected database (default is 127.0.0.1)
 
-	* db_ip <ip>  --------------->  Set IP address of the injected database
+        * db_port <port>  ----------->  Set port of the injected database (default is 5432)
 
-        * db_port <port>  ----------->  Set port of the injected database
+        * db_name <string>  --------->  Specify a name of the injected database (default is postgres)
 
-        * db_name <string>  --------->  Specify a name of the injected database
+	* db_user <string>  --------->  Set username to log in as (default is postgres)
 
-	* db_user <string>  --------->  Set username to log in as
-
-        * db_pass <string>  --------->  Set password to log in as
+        * db_pass <string>  --------->  Set password to log in as (default is postgres)
 
 	save <path>  ---------------->	Save current attack configuration to a specified path (including file name!)
 	

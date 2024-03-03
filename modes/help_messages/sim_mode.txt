@@ -2,9 +2,9 @@
 
 	[COMMAND]			[DESCRIPTION]
 
-	target_ip <ip>  ------------->	Set IP address of a network server (default is 127.0.0.1)
+	* target_ip <ip>  ----------->	Set IP address of a network server (default is 127.0.0.1)
 
-	target_port <port>  --------->	Set port of a network server (default is 8002)
+	* target_port <port>  ------->	Set port of a network server (default is 8002)
 
 	register [true|false]  ------>	Enable/disable end node register process
 
@@ -45,3 +45,6 @@
 	help  ----------------------->	Print this help message
 
 	exit  ----------------------->	Exit VulneLora
+
+
+	[* mandatory]

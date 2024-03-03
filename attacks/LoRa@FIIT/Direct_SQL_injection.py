@@ -92,12 +92,8 @@ def argument_parser():
                 print(file_content)
         elif "command" in arg_input:
             tmp_payload = extract(arg_input, "command")
-            if tmp_payload.lower() == "none":
-                attack_config['command'] = ""
-                print(f"\n>> Set argument: command='' (cleared argument)")
-            else:
-                attack_config['command'] = tmp_payload
-                print(f"\n>> Set argument: command={tmp_payload}")
+            attack_config['command'] = tmp_payload
+            print(f"\n>> Set argument: command={tmp_payload}")
         elif "db_ip" in arg_input:
             tmp_ip = extract(arg_input, "db_ip")
             if validate_ip(tmp_ip):

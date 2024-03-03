@@ -2,13 +2,13 @@
 
 	[COMMAND]			 [DESCRIPTION]
 
-	s_ip <ip>  ------------------->  Set IP address of the LoNES network server (default is 127.0.0.1)
+	* target_ip <ip>  ------------>  Set IP address of the LoNES network server (default is 127.0.0.1)
 
-	s_port <port>  --------------->  Set port of the LoNES network server (default is 8002)
+	* target_port <port>  -------->  Set port of the LoNES network server (default is 8002)
 
 	payload <string>  ------------>  Set payload of the replayed message
 
-	print_all [true|false]  ------>  Print all caught messages during the attack
+	print_all [true|false]  ------>  Enable/disable printing all caught messages during the attack
 
 	save <path>  ----------------->  Save current attack configuration to a specified path (including file name!)
 	
@@ -21,3 +21,6 @@
 	help  ------------------------>  Print this help message
 
 	exit  ------------------------>  Exit VulneLora
+
+
+	[* mandatory]

@@ -4,11 +4,11 @@
 
 	payload <string>  ----------->  Set payload to be send via SQL injection (must be lest than 255 characters!)
 
-	db_ip <ip>  ----------------->  Set IP address of the injected database
+	* db_ip <ip>  --------------->  Set IP address of the injected database (default is 127.0.0.1)
 
-        db_port <port>  ------------->  Set port of the injected database
+        * db_port <port>  ----------->  Set port of the injected database (default is 8002)
 
-        db_name <string>  ----------->  Specify a name of the injected database
+        * db_name <string>  --------->  Specify a name of the injected database
 
 	save <path>  ---------------->	Save current attack configuration to a specified path (including file name!)
 	
@@ -21,3 +21,6 @@
 	help  ----------------------->	Print this help message
 
 	exit  ----------------------->	Exit VulneLora
+
+
+	[* mandatory]
