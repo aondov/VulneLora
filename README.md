@@ -27,6 +27,13 @@ Move all files from cloned directory to your own VulneLora directory and remove 
 
 ***Note**: Be very careful when using the "rm -rf" command, as it can permanently delete files and/or directories which are given as an argument.*
 ```
+mv /opt/vulnelora/VulneLora/* /opt/vulnelora
+rm -rf /opt/vulnelora/VulneLora
+```
+
+Run *initial_setup.sh* script in the *setup_files/* directory:
+```
+cd /opt/vulnelora/setup_files/
 chmod +x initial_setup.sh
 sudo ./initial_setup.sh
 ```
