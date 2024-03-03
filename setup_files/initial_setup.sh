@@ -57,6 +57,23 @@ else
 fi
 
 
+# Get and install LoAP and util_pkt_logger services
+echo "[INFO]: Configuring the LoAP service..."
+mkdir /opt/lorafiit_forwarder/
+cd /opt/lorafiit_forwarder/
+git clone https://github.com/loraalex/LoAP.git
+mv /opt/lorafiit_forwarder/LoAP/* /opt/lorafiit_forwarder
+rm -rf /opt/lorafiit_forwarder/LoAP/
+cd /opt/lorafiit_forwarder/PacketConverter/
+./install.sh
+./install.sh daemon
+./board_reset.sh
+
+echo "[INFO]: Configuring the util_pkt_logger tool..."
+cd /opt/lorafiit_forwarder/lora_gateway/
+make
+
+
 # Service alias
 touch /usr/local/bin/vulnelora
 chmod +x /usr/local/bin/vulnelora
