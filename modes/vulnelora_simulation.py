@@ -250,7 +250,7 @@ def argument_parser():
 					print(f"\n>> Set node config: rssi={tmp_rssi}")
 				else:
 					args['node_conf']['rssi'] = ""
-                                        print("\n>> Set node config: rssi='' (revert to default value, rssi value must be from -120 to -1)")
+					print("\n>> Set node config: rssi='' (revert to default value, rssi value must be from -120 to -1)")
 			elif "node_conf snr" in arg_input:
 				tmp_snr = extract(arg_input,'node_conf snr')
 				if node_conf_validator("snr", tmp_snr):
