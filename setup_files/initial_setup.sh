@@ -35,6 +35,28 @@ echo "[SUCCESS]: Packages installed successfully."
 cat /sys/firmware/devicetree/base/model > "$tool_path/setup_files/device_info"
 
 
+# Get rockyou.txt
+echo "[INFO]: Downloading rockyou.txt.gz..."
+wget -O "$tool_path/resources/rockyou.txt.gz" https://github.com/brannondorsey/naive-hashcat/releases/download/data/rockyou.txt.gz
+
+if [ $? -eq 0 ]; then
+    echo "[SUCCESS]: Download successful."
+
+    # Extract rockyou.txt
+    echo "[INFO]: Extracting rockyou.txt.gz..."
+    gunzip "$tool_path/resources/rockyou.txt.gz"
+
+    if [ $? -eq 0 ]; then
+        echo "[SUCCESS]: Extraction successful."
+        rm "$tool_path/resources/rockyou.txt.gz"
+    else
+        echo "[FAILED]: Extraction failed, extract the rockyou file manually."
+    fi
+else
+    echo "[FAILED]: Download failed, it is recommended to download the rockyou file manually."
+fi
+
+
 # Service alias
 touch /usr/local/bin/vulnelora
 chmod +x /usr/local/bin/vulnelora
