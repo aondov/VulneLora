@@ -1,69 +1,103 @@
 # VulneLora
 Vulnerability assessment tool for LoRa technology and LoRa@FIIT protocol.
 
+<br>
+
+## [IMPORTANT] Disclaimer
+This tool is provided for educational and research purposes only. By accessing or using this tool, you agree to use it responsibly and within the bounds of the law. The creators of this tool are not responsible for any misuse, damage, or unlawful activities conducted with it. Users are reminded that unauthorized access to or disruption of wireless communications networks is illegal in many jurisdictions. It is your responsibility to ensure compliance with all applicable laws, regulations, and ethical guidelines when using this tool. Be aware of the legal implications and obtain appropriate authorization before conducting security assessments on networks that you do not own or manage.
+
+<br>
+
 ## Installing VulneLora
+Installation process of VulneLora is automatized and requires only a few steps to finish.
 
-Installation process of VulneLora is automatized and requires only few steps to finish.
-
-Firstly, install "git" and "python3":
+Firstly, install required packages:
 ```
 sudo apt update
-sudo apt install git python3
+sudo apt install git python3 postgresql-client dsniff
 ```
 
 Create a directory in "/opt" and set the owner of this directory to the current user:
-```
-sudo mkdir /opt/vulnelora
-sudo chown $USER:$USER /opt/vulnelora
-```
-
-Enter newly created directory and clone VulneLora repository in there:
-```
 cd /opt/vulnelora
 git clone https://github.com/aondov/VulneLora.git
 ```
 
-Move all files from cloned directory to own VulneLora directory and remove the cloned directory:
+Move all files from cloned directory to your own VulneLora directory and remove the cloned directory:
 
 ***Note**: Be very careful when using the "rm -rf" command, as it can permanently delete files and/or directories which are given as an argument.*
 ```
-mv /opt/vulnelora/VulneLora/* /opt/vulnelora
-rm -rf /opt/vulnelora/VulneLora
-```
-
-Run *initial_setup.sh* script in the *setup_files/* directory:
-```
-cd /opt/vulnelora/setup_files/
 chmod +x initial_setup.sh
 sudo ./initial_setup.sh
 ```
 
-If the installation process is successful, the script will notify you and you can start using the VulneLora tool. If you encounter any errors, try to re-run the script first, before examining the error in detail.
+If the installation process is successful, the script will notify you and you can start using the VulneLora tool. If you encounter any errors, try to re-run the script first before examining the error in detail.
+
+<br>
 
 ## Usage
 VulneLora can be started using following command (and its arguments):
 
-vulnelora [-h] [ -G | -S | -C ]
+vulnelora [-h] [ -I | -S ]
 
 Optional arguments:
-- **-h, --help** - Show help message and exit
-- **-G** - Run VulneLora in the interactive mode
-- **-S** - Run VulneLora in the simulation mode
-- **-C** - Run VulneLora in the command line mode
+- **-h, --help** - Show help message
+- **-I** - Run VulneLora in the interactive mode - choose the attack, configure it and run the exploit
+- **-S** - Run VulneLora in the simulation mode - configure your own LoRa@FIIT simulation (1 AP and 1-500 end nodes) and test your own scenarios
+
+<br>
+
+## Requirements
+The device which will be using the VulneLora tool needs to be compatible with following services:
+- **packet_converter** - part of the LoRaFIIT repository [3], required to capture LoRa@FIIT messages
+- **util_pkt_logger** - part of the LoRaFIIT repository [3], required to capture LoRaWAN messages
+- recommended version of Python is **Python 3.9.x**
+
+<br>
 
 ## Features
-- **main menu** - user can choose between 3 startup modes:
-1. Interactive mode - user configures the attacks using simple GUI, where specific parameters are set via command "*SET &lt;variable-name&gt; = &lt;value&gt;*"
-2. Simulation mode - user runs the *lora-ap-sim* [1] simulator, which simulates LoRa@FIIT gateway and end devices (for testing purposes)
-3. Command line mode - user configures the attacks using traditional command line arguments and runs the attack as so called "one-liner"
+- **main menu** - user can choose between 2 startup modes:
+1. Interactive mode
+    - user first chooses the attacks from displayed options, then configures the attack using a custom command line, where specific parameters are set via command "*&lt;variable-name&gt; &lt;value&gt;*"
+    - program can upload the edited firmware LoMAB [2] to an end device (applied only for some attacks)
+    - program can start pre-defined attacks, which exploit several parts of the LoRa@FIIT infrastructure
+    - program can save and load the running configuration of the selected attack
+2. Simulation mode
+    - user runs the *lora-ap-sim* [1] simulator, which simulates LoRa@FIIT gateway and end devices (for testing purposes)
+    - user can configure the connection arguments, such as RSSI, SNR, frequency, spreading factor, etc.
+    - user can configure a specific IP and port for the LoNES network server
+    - user can configure a number of end nodes to be generated and simulated
+    - user can save/load a running configuration in json format
 - **automatized installation** - VulneLora has its own installation script, which installs the VulneLora tool and prepares all necessary requirements to use it properly
+- currently supported attacks include:
+    - **Direct SQL injection** - perform the SQLi attack on a specific LoNES [4] network server or LoAP [5] access point
+    - **End device SQL injection** - perform the SQLi attack on a specific LoNES [4] network server by uploading a malicious payload to a registered end device
+    - **DoS - ARP spoofing** - perform the ARP spoofing attack on a specific network device in the infrastructure
+    - **Eavesdropping** - capture packets flowing through the access point on which the VulneLora is running on
+    - **PSK extraction** - extract the PSK value from network server or AP to allow registering of your own end device
+    - **Replay attack** - capture register packets flowing through the access point and use data from them to allow your own end device to communicate
+    - **SSH exploit** - perform a dictionary brute-force attack on the SSH service located on a network server or access point 
+
+<br>
 
 ## TODO
-- code every startup mode and test it
-- integrate *lora-ap-sim* [1] to VulneLora
-- implement the attacks on LoRa and LoRa@FIIT, regardless of the startup mode
-- create testing scenarios (acceptance tests)
-- test the attacks, evaluate their results
+- [x] code interactive mode and test it
+- [x] integrate *lora-ap-sim* [1] to VulneLora
+- [x] implement the attacks on LoRa@FIIT, regardless of the startup mode
+- [x] implement the PoC attack on LoRaWAN
+- [ ] create testing scenarios (acceptance tests)
+- [ ] test the attacks, evaluate their results
+- [x] add description for required packages to README (packet_converter, util_pkt_logger, etc.)
+- [x] add disclaimer
+
+<br>
 
 ## Sources
 [1] https://github.com/alexandervalach/lora-ap-sim.git
+
+[2] https://github.com/alexandervalach/LoMAB.git
+
+[3] https://github.com/loraalex/LoRaFIIT.git
+
+[4] https://github.com/loraalex/LoNES.git
+
+[5] https://github.com/loraalex/LoAP.git
