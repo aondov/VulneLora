@@ -19,6 +19,12 @@ sudo apt install git python3 postgresql-client dsniff
 
 Create a directory in "/opt" and set the owner of this directory to the current user:
 ```
+sudo mkdir /opt/vulnelora
+sudo chown $USER:$USER /opt/vulnelora
+```
+
+Enter newly created directory and clone VulneLora repository in there:
+```
 cd /opt/vulnelora
 git clone https://github.com/aondov/VulneLora.git
 ```
