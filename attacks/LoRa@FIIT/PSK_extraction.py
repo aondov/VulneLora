@@ -1,5 +1,8 @@
+#!/usr/bin/env python3
+
 import paramiko
 import os
+import re
 import sys
 import json
 
@@ -7,7 +10,8 @@ import json
 save_flag = 0
 service_path = "/opt/vulnelora"
 
-attack_config = {'target_ip': "192.168.94.54",
+
+attack_config = {'target_ip': "127.0.0.1",
 'target_port': 22,
 'filename': ".env",
 'ssh_creds_path': "/opt/vulnelora/resources/creds/ssh_creds.txt",
@@ -84,6 +88,14 @@ def validate_path(value):
         return 0
 
 
+def validate_ip(ip):
+    pattern = r'^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
+
+    if re.match(pattern, ip):
+        return True
+    return False
+
+
 def print_args():
     formatted_args = json.dumps(attack_config, indent=4)
     print(formatted_args)
@@ -112,21 +124,33 @@ def argument_parser():
     base_name, extension = os.path.splitext(argument)
 
     while True:
-        print(f"\033[96m\nvulora\033[0m[\033[91m{base_name}\033[96m]>\033[0m ", end='')
+        print(f"\033[96m\nvulnelora\033[0m[\033[91m{base_name}\033[96m]>\033[0m ", end='')
         arg_input = input()
 
         if arg_input == "help":
-            with open(service_path + '/modes/help_messages/psk_extraction.txt', 'r') as file:
+            with open(f"{service_path}/modes/help_messages/psk_extraction.txt", 'r') as file:
                 file_content = file.read()
                 print(file_content)
         elif "target_ip" in arg_input:
             tmp_target_ip = extract(arg_input, "target_ip")
-            attack_config['target_ip'] = tmp_target_ip
-            print(f"\n>> Set argument: target_ip={tmp_target_ip}")
+            if validate_ip(tmp_target_ip):
+                attack_config['target_ip'] = tmp_target_ip
+                print(f"\n>> Set argument: target_ip={tmp_target_ip}")
+            else:
+                attack_config['target_ip'] = "127.0.0.1"
+                print(f"\n>> Set argument: target_ip=127.0.0.1 (revert to default value, must be a valid IP address)")
         elif "target_port" in arg_input:
             tmp_target_port = extract(arg_input, "target_port")
-            attack_config['target_port'] = tmp_target_port
-            print(f"\n>> Set argument: target_port={tmp_target_port}")
+            try:
+                int_tmp_port = int(tmp_target_port)
+                if 1 <= int_tmp_port <= 65535:
+                    attack_config['target_port'] = int_tmp_port
+                    print(f"\n>> Set argument: target_port={int_tmp_port}")
+                else:
+                    raise ValueError()
+            except ValueError:
+                    attack_config['target_port'] = 22
+                    print(f"\n>> Set argument: target_port=22 (revert to default value, port must be from 1 to 65535)")
         elif "try_sudo" in arg_input:
             if arg_input == "try_sudo true":
                 attack_config['try_sudo'] = True

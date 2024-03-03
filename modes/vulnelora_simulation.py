@@ -5,15 +5,16 @@ import os
 import json
 import re
 
+
 service_path = "/opt/vulnelora"
 sim_path = service_path + "/resources/lora-ap-sim/src"
 save_flag = 0
 
-# sim_arguments
-args = {'server':"127.0.0.1",
-'port':8002,
+
+args = {'target_ip':"127.0.0.1",
+'target_port':8002,
 'register':0,
-'dev_id':"111111",
+'ap_id':"111111",
 'shuffle':0,
 'nodes':1,
 'node_path':"",
@@ -69,7 +70,6 @@ def nodes_validator(value):
 		if 1 <= int_value <= upper_value:
 			return 0
 		else:
-			print(f"\n[ERROR]: Number of end nodes can only be within the range 1-{upper_value}. Please, try again.")
 			return 1
 	except ValueError:
 		print("\n[ERROR]: Invalid input. Please enter a valid number.")
@@ -122,7 +122,6 @@ def validate_port(value):
 		int_port = int(value)
 		return (1 <= int_port <= 65535)
 	except ValueError:
-		print("[ERROR]: Port value must be in range 1-65535.")
 		return 0
 
 
@@ -132,11 +131,11 @@ def extract(text, value):
 
 def node_conf_validator(conf_type, value):
 	if conf_type == "rssi":
-		return -130 <= int(value) < 0
+		return -120 <= int(value) < 0
 	elif conf_type == "snr":
 		return -20 <= int(value) <= 10
 	elif conf_type == "freq":
-		pattern = re.compile(r'^86[6-8]\.\d{1,3}$')
+		pattern = re.compile(r'^86[6-8]\.\d{1,1}$')
 		if pattern.match(value):
 			return 1
 		else:
@@ -172,13 +171,21 @@ def transfer_conf(loaded_conf):
 	args.update(loaded_conf)
 
 
+def validate_ip(ip):
+	pattern = r'^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
+
+	if re.match(pattern, ip):
+		return True
+	return False
+
+
 def argument_parser():
 	while True:
-		print(f"\033[96m\nvulora_sim>\033[0m ", end='')
+		print(f"\033[96m\nvulnelora\033[0m[\033[91mSimulation\033[0m]> ", end='')
 		arg_input = input()
 
 		if "help" in arg_input:
-			with open(service_path + '/modes/help_messages/sim_mode.txt', 'r') as file:
+			with open(f"{service_path}/modes/help_messages/sim_mode.txt", 'r') as file:
 				file_content = file.read()
 				print(file_content)
 		elif "nodes" in arg_input:
@@ -188,41 +195,45 @@ def argument_parser():
 				print(f"\n>> Set argument: nodes={tmp_nodes_num}")
 			else:
 				args['nodes'] = 1
-				print("\n>> Set argument: nodes=1 (default value, validation failed)")
-		elif "server" in arg_input:
-			tmp_server_ip = extract(arg_input,'server')
-			args['server'] = tmp_server_ip
-			print(f"\n>> Set argument: server={tmp_server_ip}")
-		elif "port" in arg_input:
-			tmp_port = extract(arg_input,'port')
-			if validate_port(tmp_port):
-				args['port'] = int(tmp_port)
-				print(f"\n>> Set argument: port={tmp_port}")
+				print("\n>> Set argument: nodes=1 (revert to default value, the amount of nodes must be from 1 to 500)")
+		elif "target_ip" in arg_input:
+			tmp_server_ip = extract(arg_input,'target_ip')
+			if validate_ip(tmp_server_ip):
+				args['target_ip'] = tmp_server_ip
+				print(f"\n>> Set argument: target_ip={tmp_server_ip}")
 			else:
-				args['port'] = 8002
-				print("\n>> Set argument: port=8002 (default value, validation failed)")
+				args['target_ip'] = "127.0.0.1"
+				print(f"\n>> Set argument: target_ip=127.0.0.1 (revert to default value, must be a valid IP address)")
+		elif "target_port" in arg_input:
+			tmp_port = extract(arg_input,'target_port')
+			if validate_port(tmp_port):
+				args['target_port'] = int(tmp_port)
+				print(f"\n>> Set argument: target_port={tmp_port}")
+			else:
+				args['target_port'] = 8002
+				print("\n>> Set argument: target_port=8002 (revert to default value, port must be from 1 to 65535)")
 		elif "register" in arg_input:
-			if "register true" in arg_input:
-				args['register'] = 1
+			if arg_input == "register true":
+				args['register'] = True
 				print("\n>> Enabled argument: register")
 			else:
-				args['register'] = 0
+				args['register'] = False
 				print("\n>> Disabled argument: register")
 		elif "shuffle" in arg_input:
-			if "shuffle true" in arg_input:
-				args['shuffle'] = 1
+			if arg_input == "shuffle true":
+				args['shuffle'] = True
 				print("\n>> Enabled argument: shuffle")
 			else:
-				args['shuffle'] = 0
+				args['shuffle'] = False
 				print("\n>> Disabled argument: shuffle")
-		elif "dev_id" in arg_input:
-			tmp_dev_id = extract(arg_input,'dev_id')
+		elif "ap_id" in arg_input:
+			tmp_dev_id = extract(arg_input,'ap_id')
 			if validate_dev_id(tmp_dev_id):
-				args['dev_id'] = tmp_dev_id
-				print(f"\n>> Set argument: dev_id={tmp_dev_id}")
+				args['ap_id'] = tmp_dev_id
+				print(f"\n>> Set argument: ap_id={tmp_dev_id}")
 			else:
-				args['dev_id'] = '111111'
-				print("\n>> Set argument: dev_id=111111 (default value, validation failed)")
+				args['ap_id'] = '111111'
+				print("\n>> Set argument: ap_id=111111 (revert to default value, validation failed)")
 		elif "node_path" in arg_input:
 			tmp_node_path = extract(arg_input,'node_path')
 			if validate_node_path(tmp_node_path):
@@ -230,7 +241,7 @@ def argument_parser():
 				print("\n>> Set argument: node_path={tmp_node_path}.")
 			else:
 				args['node_path'] = ""
-				print("\n>> Set argument: node_path='' (default value, validation failed)")
+				print("\n>> Set argument: node_path='' (revert to default value, validation failed)")
 		elif "node_conf" in arg_input:
 			if "node_conf rssi" in arg_input:
 				tmp_rssi = extract(arg_input,'node_conf rssi')
@@ -239,7 +250,7 @@ def argument_parser():
 					print(f"\n>> Set node config: rssi={tmp_rssi}")
 				else:
 					args['node_conf']['rssi'] = ""
-					print("\n>> Set node config: rssi=\"\" (default value, validation failed)")
+                                        print("\n>> Set node config: rssi='' (revert to default value, rssi value must be from -120 to -1)")
 			elif "node_conf snr" in arg_input:
 				tmp_snr = extract(arg_input,'node_conf snr')
 				if node_conf_validator("snr", tmp_snr):
@@ -247,7 +258,7 @@ def argument_parser():
 					print(f"\n>> Set node config: snr={tmp_snr}")
 				else:
 					args['node_conf']['snr'] = ""
-					print("\n>> Set node config: snr=\"\" (default value, validation failed)")
+					print("\n>> Set node config: snr='' (revert to default value, snr value must be from -20 to 10)")
 			elif "node_conf freq" in arg_input:
 				tmp_freq = extract(arg_input,'node_conf freq')
 				if node_conf_validator("freq", tmp_freq):
@@ -255,7 +266,7 @@ def argument_parser():
 					args['node_conf']['freq'] = str(int_freq)
 					print(f"\n>> Set node config: frequency={int_freq}")
 				else:
-					print("\n>> Set node config: frequency=\"\" (default value, validation failed)")
+					print("\n>> Set node config: frequency='' (revert to default value, freq value must have format 868.N or 866.N)")
 			elif "node_conf distance" in arg_input:
 				tmp_dist = extract(arg_input,'node_conf distance')
 				if node_conf_validator("distance", tmp_dist):
@@ -263,7 +274,7 @@ def argument_parser():
 					print(f"\n>> Set node config: distance={tmp_dist}")
 				else:
 					args['node_conf']['distance'] = ""
-					print("\n>> Set node config: distance=\"\" (default value, validation failed)")
+					print("\n>> Set node config: distance='' (revert to default value, distance value must be from 1 to 100)")
 			elif "node_conf sf" in arg_input:
 				tmp_sf = extract(arg_input,'node_conf sf')
 				if node_conf_validator("sf", tmp_sf):
@@ -271,7 +282,7 @@ def argument_parser():
 					print(f"\n>> Set node config: sf={tmp_sf}")
 				else:
 					args['node_conf']['sf'] = ""
-					print("\n>> Set node config: sf=\"\" (default value, validation failed)")
+					print("\n>> Set node config: sf='' (revert to default value, sf value must be from 7 to 12)")
 			elif "node_conf payload" in arg_input:
 				tmp_payload = extract(arg_input,'node_conf payload')
 				if node_conf_validator("payload", tmp_payload):
@@ -279,7 +290,7 @@ def argument_parser():
 					print(f"\n>> Set node config: payload={tmp_payload}")
 				else:
 					args['node_conf']['payload'] = ""
-					print("\n>> Set node config: payload=\"\" (default value, validation failed)")
+					print("\n>> Set node config: payload='' (revert to default value, payload must be less than 256 characters)")
 			else:
 				print("\n[ERROR]: Unknown end node configuration parameter. Type 'help' to see the supported parameters.")
 		elif "save" in arg_input:
@@ -328,23 +339,23 @@ def argument_parser():
 
 
 def generate_sim_command():
-	replace_line(sim_path + '/generator.py', '# nodes_config_point', 'num_of_nodes = ' + str(args['nodes']))
-	replace_line(sim_path + '/main.py', '# server_conf_point', '    conn.connect(\"' + args['server'] + '\", ' + str(args['port']) + ')')
+	replace_line(f"{sim_path}/generator.py", '# nodes_config_point', f"num_of_nodes = {str(args['nodes'])}")
+	replace_line(f"{sim_path}/main.py", '# server_conf_point', f"    conn.connect(\"{args['target_ip']}\", {args['target_port']})")
 
 	if args['node_conf']['rssi'] != "":
-		replace_line(sim_path + '/node.py', '# rssi_conf_point', '        rssi = ' + args['node_conf']['rssi'])
+		replace_line(f"{sim_path}/node.py", '# rssi_conf_point', f"        rssi = {args['node_conf']['rssi']}")
 	if args['node_conf']['snr'] != "":
-		replace_line(sim_path + '/node.py', '# snr_conf_point', '        snr = ' + args['node_conf']['snr'])
+		replace_line(f"{sim_path}/node.py", '# snr_conf_point', f"        snr = {args['node_conf']['snr']}")
 	if args['node_conf']['freq'] != "":
-		replace_line(sim_path + '/node.py', '# freq_conf_point', '        freq = ' + args['node_conf']['freq'])
+		replace_line(f"{sim_path}/node.py", '# freq_conf_point', f"        freq = {args['node_conf']['freq']}")
 	if args['node_conf']['distance'] != "":
-		replace_line(sim_path + '/node.py', '# dist_conf_point', '        distance = ' + args['node_conf']['distance'])
+		replace_line(f"{sim_path}/node.py", '# dist_conf_point', f"        distance = {args['node_conf']['distance']}")
 	if args['node_conf']['sf'] != "":
-		replace_line(sim_path + '/node.py', '# sf_conf_point', '        sf = ' + args['node_conf']['sf'])
+		replace_line(f"{sim_path}/node.py", '# sf_conf_point', f"        sf = {args['node_conf']['sf']}")
 	if args['node_conf']['payload'] != "":
-		replace_line(sim_path + '/node.py', '# payload_conf_point', '        app_data = \"' + args['node_conf']['payload'] + '\"')
+		replace_line(f"{sim_path}/node.py", '# payload_conf_point', f"        app_data = \"{args['node_conf']['payload']}\"")
 
-	subprocess.run(['python3', sim_path + '/generator.py'])
+	subprocess.run(['python3', f"{sim_path}/generator.py"])
 
 	if check_node_generator():
 		print("\n[SUCCESS]: End nodes generated successfully!\n")
@@ -353,19 +364,19 @@ def generate_sim_command():
 		check_save()
 		stop_sim(False, 1)
 
-	final_command = "vulnelora -S -run \"-i " + args['dev_id']
+	final_command = f"vulnelora -S -run \"-i {args['ap_id']}"
 
 	if args['register'] == 1:
 		final_command = final_command + " -r"
 	if args['shuffle'] == 1:
 		final_command = final_command + " -s"
 	if args['node_path'] != "":
-		final_command = final_command + " -f " + args['node_path']
+		final_command = final_command + f" -f {args['node_path']}"
 
-	print("[SUCCESS]: Simulation configured, please run following command: " + final_command + "\"\n")
+	print(f"[SUCCESS]: Simulation configured, please run following command: {final_command}\"\n")
 
 
-with open(service_path + '/modes/intro_messages/sim_mode.txt', 'r') as file:
+with open(f"{service_path}/modes/intro_messages/sim_mode.txt", 'r') as file:
 	file_content = file.read()
 	print(file_content)
 

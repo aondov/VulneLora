@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import os
 import re
 import sys
@@ -8,13 +10,13 @@ import subprocess
 save_flag = 0
 service_path = "/opt/vulnelora"
 end_devices = []
-sim_path = service_path + "/resources/lora-ap-sim/src"
+sim_path = f"{service_path}/resources/lora-ap-sim/src"
 ap_id = "123456"
 
 
-attack_config = {'s_ip': "192.168.94.54",
-'s_port': 8002,
-'payload': "testtest",
+attack_config = {'target_ip': "127.0.0.1",
+'target_port': 8002,
+'payload': "",
 'print_all': False
 }
 
@@ -131,7 +133,7 @@ def run_attack():
                     print()
 
                 if "REGA" in msg_name and not confirm_freq_flag:
-                    print(f"\033[91m!!! CAUGHT REGISTRATION ACKNOWLEDGEMENT !!!\033[0m")
+                    print(f"\033[91m!!! CAUGHT REGISTRATION ACK !!!\033[0m")
                     print(30 * f"\033[91m#\033[0m")
                     print(f">> \033[91mMessage\033[0m ==> {parsed}")
                     print(30 * f"\033[91m#\033[0m")
@@ -195,7 +197,7 @@ def check_node_generator():
 
 
 def generate_sim_command(dev_id, freq, snr, sf, rssi, psk):
-    replace_line(f'{sim_path}/main.py', '# server_conf_point', f"    conn.connect(\"{attack_config['s_ip']}\", {str(attack_config['s_port'])})")
+    replace_line(f'{sim_path}/main.py', '# server_conf_point', f"    conn.connect(\"{attack_config['target_ip']}\", {attack_config['target_port']})")
     replace_line(f"{sim_path}/main.py", '# node_id_conf_point', f"        node_ids = [\"{dev_id}\"]")
     replace_line(f"{sim_path}/lora.py", '# psk_conf_point', f"PRE_SHARED_KEY = '{psk}'")
 
@@ -214,9 +216,7 @@ def generate_sim_command(dev_id, freq, snr, sf, rssi, psk):
         check_save()
         reset_sim()
 
-    final_command = f"vulnelora -S -run \"-i {ap_id} -r\""
-
-    print(f"[SUCCESS]: Simulation configured, please run following command: {final_command}\n")
+    print(f"[SUCCESS]: Simulation configured, please run the following command: vulnelora -S -run \"-i {ap_id} -r\"\n")
 
 
 def detect_service():
@@ -231,48 +231,56 @@ def detect_service():
         print(e)
 
 
+def validate_ip(ip):
+    pattern = r'^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
+
+    if re.match(pattern, ip):
+        return True
+    return False
+
+
 def argument_parser():
     argument = sys.argv[1]
     base_name, extension = os.path.splitext(argument)
 
     while True:
-        print(f"\033[96m\nvulora\033[0m[\033[91m{base_name}\033[96m]>\033[0m ", end='')
+        print(f"\033[96m\nvulnelora\033[0m[\033[91m{base_name}\033[96m]>\033[0m ", end='')
         arg_input = input()
 
         if arg_input == "help":
-            with open(service_path + '/modes/help_messages/replay.txt', 'r') as file:
+            with open(f"{service_path}/modes/help_messages/replay.txt", 'r') as file:
                 file_content = file.read()
                 print(file_content)
         elif "payload" in arg_input:
             tmp_payload = extract(arg_input, "payload")
             attack_config['payload'] = tmp_payload
             print(f"\n>> Set argument: payload={tmp_payload}")
-        elif "s_ip" in arg_input:
-            tmp_ip = extract(arg_input, "s_ip")
-            if "." in tmp_ip and len(tmp_ip) >= 7:
-                attack_config['s_ip'] = tmp_ip
-                print(f"\n>> Set argument: s_ip={tmp_ip}")
+        elif "target_ip" in arg_input:
+            tmp_ip = extract(arg_input, "target_ip")
+            if validate_ip(tmp_ip):
+                attack_config['target_ip'] = tmp_ip
+                print(f"\n>> Set argument: target_ip={tmp_ip}")
             else:
-                attack_config['s_ip'] = "127.0.0.1"
-                print("\n>> Set argument: s_ip='127.0.0.1' (default value, must be a valid IP address)")
-        elif "s_port" in arg_input:
-            tmp_port = extract(arg_input, "s_port")
+                attack_config['target_ip'] = "127.0.0.1"
+                print("\n>> Set argument: target_ip='127.0.0.1' (revert to default value, must be a valid IP address)")
+        elif "target_port" in arg_input:
+            tmp_port = extract(arg_input, "target_port")
             try:
                 int_tmp_port = int(tmp_port)
                 if 1 <= int_tmp_port <= 65535:
-                    attack_config['s_port'] = tmp_port
-                    print(f"\n>> Set argument: s_port={tmp_port}")
+                    attack_config['target_port'] = tmp_port
+                    print(f"\n>> Set argument: target_port={tmp_port}")
                 else:
                     raise ValueError()
             except ValueError:
-                attack_config['s_port'] = 8002
-                print("\n>> Set argument: s_port=8002 (default value, server port must be from 1 to 65535)")
+                attack_config['target_port'] = 8002
+                print("\n>> Set argument: target_port=8002 (revert to default value, port must be from 1 to 65535)")
         elif "print_all" in arg_input:
-            if "print_all true" in arg_input:
-                attack_config['print_all'] = 1
+            if arg_input == "print_all true":
+                attack_config['print_all'] = True
                 print(f"\n>> Enabled argument: print_all")
             else:
-                attack_config['print_all'] = 0
+                attack_config['print_all'] = False
                 print(f"\n>> Disabled argument: print_all")
         elif arg_input == "print":
             print("\n>> Current argument configuration:")

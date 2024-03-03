@@ -3,18 +3,17 @@ import sys
 import json
 import csv
 import subprocess
-from pathlib import Path
 
 
 save_flag = 0
 service_path = "/opt/vulnelora"
-pkt_logger_path = "/opt/vulnelora/resources"
+pkt_logger_path = f"{service_path}/resources/lora_gateway/util_pkt_logger"
 
 
 attack_config = {'save_capture': False,
-'capture_path': "",
+'capture_path': "./lorawan_vulnelora_capture.log",
 'save_analysis': False,
-'analysis_path': ""
+'analysis_path': "./lorawan_vulnelora_analysis.log"
 }
 
 
@@ -185,22 +184,22 @@ def argument_parser():
     base_name, extension = os.path.splitext(argument)
 
     while True:
-        print(f"\033[96m\nvulora\033[0m[\033[91m{base_name}\033[96m]>\033[0m ", end='')
+        print(f"\033[96m\nvulnelora\033[0m[\033[91m{base_name}\033[96m]>\033[0m ", end='')
         arg_input = input()
 
         if arg_input == "help":
-            with open(service_path + '/modes/help_messages/eavesdropping.txt', 'r') as file:
+            with open(f"{service_path}/modes/help_messages/eavesdropping.txt", 'r') as file:
                 file_content = file.read()
                 print(file_content)
         elif "save_capture" in arg_input:
-            if "save_capture true" in arg_input:
+            if arg_input == "save_capture true":
                 attack_config['save_capture'] = True
                 print(f"\n>> Enabled argument: save_capture")
             else:
                 attack_config['save_capture'] = False
                 print(f"\n>> Disabled argument: save_capture")
         elif "save_analysis" in arg_input:
-            if "save_analysis true" in arg_input:
+            if arg_input == "save_analysis true":
                 attack_config['save_analysis'] = True
                 print(f"\n>> Enabled argument: save_analysis")
             else:
@@ -226,8 +225,8 @@ def argument_parser():
                     attack_config['capture_path'] = tmp_c_path
                     print(f"\n>> Set argument: capture_path={tmp_c_path}")
                 else:
-                    attack_config['capture_path'] = "./vulora_capture.log"
-                    print("\n>> Set argument: capture_path='./vulora_capture.log' (default value, path is not valid)")
+                    attack_config['capture_path'] = "./lorawan_vulnelora_capture.log"
+                    print("\n>> Set argument: capture_path='./lorawan_vulnelora_capture.log' (default value, path is not valid)")
         elif "analysis_path" in arg_input:
             if attack_config['save_analysis'] == False:
                 print("\n>> [ERROR]: Enable save_analysis configuration first using command 'save_analysis True'!")
@@ -248,8 +247,8 @@ def argument_parser():
                     attack_config['analysis_path'] = tmp_a_path
                     print(f"\n>> Set argument: analysis_path={tmp_a_path}")
                 else:
-                    attack_config['analysis_path'] = "./vulora_analysis.log"
-                    print("\n>> Set argument: analysis_path='./vulora_analysis.log' (default value, path is not valid)")
+                    attack_config['analysis_path'] = "./lorawan_vulnelora_analysis.log"
+                    print("\n>> Set argument: analysis_path='./lorawan_vulnelora_analysis.log' (default value, path is not valid)")
         elif arg_input == "print":
             print("\n>> Current argument configuration:")
             print_args()

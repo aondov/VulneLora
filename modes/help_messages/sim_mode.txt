@@ -2,15 +2,15 @@
 
 	[COMMAND]			[DESCRIPTION]
 
-	server <ip>  ---------------->	Set IP address of a network server (default is 127.0.0.1)
+	target_ip <ip>  ------------->	Set IP address of a network server (default is 127.0.0.1)
 
-	port <port>  ---------------->	Set port of a network server (default is 8002)
+	target_port <port>  --------->	Set port of a network server (default is 8002)
 
 	register [true|false]  ------>	Enable/disable end node register process
 
 	shuffle [true|false]  ------->	Enable/disable end node ID shuffle before start
 
-	dev_id <dev_id_value>  ------>	Set custom hardware ID for AP (default is 111111) - Allowed only hexadecimal characters
+	ap_id <hex>  ---------------->	Set custom hardware ID for AP (default is 111111) - Allowed only hexadecimal characters
 
 	nodes <amount>  ------------->	Set the amount of end nodes to be generated (default is 1, max. 500)
 
@@ -27,9 +27,9 @@
 
 					sf  --------->	[7, 8, 9, 10, 11, 12]
 
-					dist  ------->	< 1 ; 100 > km
+					distance  --->	< 1 ; 100 > km
 
-					freq  ------->	(allowed format "868.xyz" or "866.xyz", e.g. "866.123")
+					freq  ------->	(allowed format "868.N" or "866.N", e.g. "866.1")
 
 					payload  ---->	< 1 ; 255 > characters
 	

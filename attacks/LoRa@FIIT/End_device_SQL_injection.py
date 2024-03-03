@@ -1,4 +1,7 @@
+#!/usr/bin/env python3
+
 import os
+import re
 import sys
 import json
 import subprocess
@@ -6,13 +9,14 @@ import subprocess
 
 save_flag = 0
 service_path = "/opt/vulnelora"
-lomab_dir = service_path + "/resources/LoMAB"
-sim_path = service_path + "/resources/lora-ap-sim/src"
+lomab_dir = f"{service_path}/resources/LoMAB"
+sim_path = f"{service_path}/resources/lora-ap-sim/src"
 
 
-attack_config = {'payload': "",
-'simulate': False,
-'server_ip': "127.0.0.1"
+attack_config = {'target_ip': "127.0.0.1",
+'target_port': 8002,
+'payload': "",
+'simulate': False
 }
 
 
@@ -31,12 +35,12 @@ def replace_line(file_path, search_string, replace_string):
             with open(file_path, 'w') as file:
                 file.writelines(lines)
         else:
-            print("[ERROR]: There was a problem generating the specified amount of end nodes.")
+            print("[ERROR]: There was a problem configuring source codes for this attack. Try again, please.")
 
 
 def reset_sim():
-    replace_line(sim_path + '/node.py', '# payload_conf_point', '        app_data = LoRa.get_data(self.x, self.y)')
-    replace_line(sim_path + '/main.py', '# server_conf_point', '    conn.connect(\"127.0.0.1\", 8002)')
+    replace_line(f"{sim_path}/node.py", '# payload_conf_point', '        app_data = LoRa.get_data(self.x, self.y)')
+    replace_line(f"{sim_path}/main.py", '# server_conf_point', '    conn.connect(\"127.0.0.1\", 8002)')
 
 
 def check_save():
@@ -88,16 +92,24 @@ def transfer_conf(loaded_conf):
         attack_config.update(loaded_conf)
 
 
+def validate_ip(ip):
+    pattern = r'^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
+
+    if re.match(pattern, ip):
+        return True
+    return False
+
+
 def argument_parser():
     argument = sys.argv[1]
     base_name, extension = os.path.splitext(argument)
 
     while True:
-        print(f"\033[96m\nvulora\033[0m[\033[91m{base_name}\033[96m]>\033[0m ", end='')
+        print(f"\033[96m\nvulnelora\033[0m[\033[91m{base_name}\033[96m]>\033[0m ", end='')
         arg_input = input()
 
         if arg_input == "help":
-            with open(service_path + '/modes/help_messages/end_device_sql_injection.txt', 'r') as file:
+            with open(f"{service_path}/modes/help_messages/end_device_sql_injection.txt", 'r') as file:
                 file_content = file.read()
                 print(file_content)
         elif "payload" in arg_input:
@@ -115,10 +127,30 @@ def argument_parser():
             else:
                 attack_config['simulate'] = False
                 print("\n>> Disable argument: simulate")
-        elif "server_ip" in arg_input:
-            tmp_ip = extract(arg_input, "server_ip")
-            attack_config['server_ip'] = tmp_ip
-            print(f"\n>> Set argument: server_ip={tmp_ip}")
+        elif "target_ip" in arg_input:
+            tmp_ip = extract(arg_input, "target_ip")
+            if validate_ip(tmp_ip):
+                attack_config['target_ip'] = tmp_ip
+                print(f"\n>> Set argument: target_ip={tmp_ip}")
+                if attack_config['simulate'] == False:
+                    print("\n[WARNING]: This argument is valid only when simulating this attack.")
+            else:
+                attack_config['target_ip'] = "127.0.0.1"
+                print(f"\n>> Set argument: target_ip=127.0.0.1 (revert to default value, must be a valid IP address)")
+        elif "target_port" in arg_input:
+            tmp_target_port = extract(arg_input, "target_port")
+            try:
+                int_tmp_port = int(tmp_target_port)
+                if 1 <= int_tmp_port <= 65535:
+                    attack_config['target_port'] = int_tmp_port
+                    print(f"\n>> Set argument: target_port={int_tmp_port}")
+                    if attack_config['simulate'] == False:
+                        print("\n[WARNING]: This argument is valid only when simulating this attack.")
+                else:
+                    raise ValueError()
+            except ValueError:
+                    attack_config['target_port'] = 8002
+                    print(f"\n>> Set argument: target_port=8002 (revert to default value, port must be from 1 to 65535)")
         elif arg_input == "print":
             print("\n>> Current argument configuration:")
             print_args()
@@ -195,13 +227,13 @@ def run_attack():
 
 
 def simulate_attack():
-    replace_line(sim_path + '/generator.py', '# nodes_config_point', 'num_of_nodes = 1')
-    replace_line(sim_path + '/node.py', '# payload_conf_point', f'        app_data = \"{attack_config["payload"]}\"')
-    replace_line(sim_path + '/main.py', '# server_conf_point', f'    conn.connect(\"{attack_config["server_ip"]}\", 8002)')
+    print("\n[INFO]: Configuring the simulation for SQL injection attack from an end device...\n")
 
-    print("\n[INFO]: Starting the simulated SQL injection attack from end device...\n")
+    replace_line(f"{sim_path}/generator.py", '# nodes_config_point', 'num_of_nodes = 1')
+    replace_line(f"{sim_path}/node.py", '# payload_conf_point', f'        app_data = \"{attack_config["payload"]}\"')
+    replace_line(f"{sim_path}/main.py", '# server_conf_point', f'    conn.connect(\"{attack_config["target_ip"]}\", {attack_config["target_port"]})')
 
-    print('vulnelora -S -run \"-i 123456 -r\"')
+    print("[SUCCESS]: Simulation configured, please run the following command: vulnelora -S -run \"-i 123456 -r\"\n")
 
 
 def detect_device():
@@ -220,6 +252,7 @@ if __name__ == "__main__":
         reset_sim()
         detect_device()
         argument_parser()
+
         if attack_config['simulate']:
             simulate_attack()
         else:

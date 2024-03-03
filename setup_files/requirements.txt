@@ -1,2 +1,4 @@
 paramiko
 platformio
+netifaces
+pythonping

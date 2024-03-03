@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import os
 import sys
 import json
@@ -9,9 +11,9 @@ service_path = "/opt/vulnelora"
 
 
 attack_config = {'save_capture': False,
-'capture_path': "",
+'capture_path': "./vulnelora_capture.log",
 'save_analysis': False,
-'analysis_path': ""
+'analysis_path': "./vulnelora_analysis.log"
 }
 
 
@@ -66,7 +68,7 @@ def transfer_conf(loaded_conf):
 
 def collect_logs():
     print("\n [INFO]: Started collecting logs (stop with Ctrl+c)...\n")
-    output_file = f"{service_path}/resources/tmp_capture.log"
+    output_file = f"{service_path}/resources/eavesdropping_tmp_capture.log"
 
     try:
         if not os.path.exists(output_file):
@@ -94,7 +96,7 @@ def collect_logs():
 
 def analyze_logs():
     json_logs = []
-    log_file = f"{service_path}/resources/tmp_capture.log"
+    log_file = f"{service_path}/resources/eavesdropping_tmp_capture.log"
     record_counter = 1
 
     try:
@@ -138,11 +140,15 @@ def analyze_logs():
         if "REGR" in log['message_name']:
             print(f"\n>> [INFO]: Caught REGISTRATION REQUEST data for device {log['message_body']['dev_id']}\n")
         elif "REGA" in log['message_name']:
-            print(f"\n>> [INFO]: Caught REGISTRATION RESPONSE data for device {log['message_body']['dev_id']}\n")
+            print(f"\n>> [INFO]: Caught REGISTRATION ACK data for device {log['message_body']['dev_id']}\n")
+        elif "SETR" in log['message_name']:
+            print(f"\n>> [INFO]: Caught AP REGISTRATION REQUEST data for AP {log['message_body']['id']}\n")
+        elif "SETA" in log['message_name']:
+            print(f"\n>> [INFO]: Caught AP REGISTRATION ACK data for AP {log['message_body']['id']}\n")
         elif "TXL" in log['message_name']:
-            print(f"\n>> [INFO]: Caught RECEIVED data for device {log['message_body']['dev_id']}\n")
+            print(f"\n>> [INFO]: Caught RECEIVED data to device {log['message_body']['dev_id']}\n")
         elif "RXL" in log['message_name']:
-            print(f"\n>> [INFO]: Caught TRANSMITTED data for device {log['message_body']['dev_id']}\n")
+            print(f"\n>> [INFO]: Caught TRANSMITTED data from device {log['message_body']['dev_id']}\n")
         elif "KEYS" in log['message_name']:
             print(f"\n>> [INFO]: Caught KEYS data for device {log['message_body']['dev_id']}\n")
         else:
@@ -168,6 +174,8 @@ def analyze_logs():
 
         print(f"\n[SUCCESS]: Analyzed data saved successfully in '{a_logfile}'!")
 
+    os.remove(log_path)
+
 
 def detect_service():
     try:
@@ -186,7 +194,7 @@ def argument_parser():
     base_name, extension = os.path.splitext(argument)
 
     while True:
-        print(f"\033[96m\nvulora\033[0m[\033[91m{base_name}\033[96m]>\033[0m ", end='')
+        print(f"\033[96m\nvulnelora\033[0m[\033[91m{base_name}\033[96m]>\033[0m ", end='')
         arg_input = input()
 
         if arg_input == "help":
@@ -194,14 +202,14 @@ def argument_parser():
                 file_content = file.read()
                 print(file_content)
         elif "save_capture" in arg_input:
-            if "save_capture true" in arg_input:
+            if arg_input == "save_capture true":
                 attack_config['save_capture'] = True
                 print(f"\n>> Enabled argument: save_capture")
             else:
                 attack_config['save_capture'] = False
                 print(f"\n>> Disabled argument: save_capture")
         elif "save_analysis" in arg_input:
-            if "save_analysis true" in arg_input:
+            if arg_input == "save_analysis true":
                 attack_config['save_analysis'] = True
                 print(f"\n>> Enabled argument: save_analysis")
             else:
@@ -209,7 +217,7 @@ def argument_parser():
                 print(f"\n>> Disabled argument: save_analysis")
         elif "capture_path" in arg_input:
             if attack_config['save_capture'] == False:
-                print("\n>> [ERROR]: Enable save_capture configuration first using command 'save_capture True'!")
+                print("\n>> [ERROR]: Enable save_capture configuration first using command 'save_capture true'!")
                 continue
             tmp_c_path = extract(arg_input, 'capture_path')
             if validate_path(tmp_c_path):
@@ -227,11 +235,11 @@ def argument_parser():
                     attack_config['capture_path'] = tmp_c_path
                     print(f"\n>> Set argument: capture_path={tmp_c_path}")
                 else:
-                    attack_config['capture_path'] = "./vulora_capture.log"
-                    print("\n>> Set argument: capture_path='./vulora_capture.log' (default value, path is not valid)")
+                    attack_config['capture_path'] = "./vulnelora_capture.log"
+                    print("\n>> Set argument: capture_path='./vulnelora_capture.log' (default value, path is not valid)")
         elif "analysis_path" in arg_input:
             if attack_config['save_analysis'] == False:
-                print("\n>> [ERROR]: Enable save_analysis configuration first using command 'save_analysis True'!")
+                print("\n>> [ERROR]: Enable save_analysis configuration first using command 'save_analysis true'!")
                 continue
             tmp_a_path = extract(arg_input, 'analysis_path')
             if validate_path(tmp_a_path):
@@ -249,8 +257,8 @@ def argument_parser():
                     attack_config['analysis_path'] = tmp_a_path
                     print(f"\n>> Set argument: analysis_path={tmp_a_path}")
                 else:
-                    attack_config['analysis_path'] = "./vulora_analysis.log"
-                    print("\n>> Set argument: analysis_path='./vulora_analysis.log' (default value, path is not valid)")
+                    attack_config['analysis_path'] = "./vulnelora_analysis.log"
+                    print("\n>> Set argument: analysis_path='./vulnelora_analysis.log' (default value, path is not valid)")
         elif arg_input == "print":
             print("\n>> Current argument configuration:")
             print_args()
