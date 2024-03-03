@@ -1,19 +1,15 @@
 #!/bin/bash
 
-
 # Check sudo
 if [ "$(id -u)" != "0" ]; then
     echo -ne "\n[ERROR]: You need root privileges to run this script.\n"
     exit 1
 fi
 
-
 echo -ne "\nStarting VulneLora installation...\n\n"
-
 
 # Default vulnelora tool path
 tool_path="/opt/vulnelora"
-
 
 # Required services installation
 apt update
@@ -24,16 +20,13 @@ if [ ! -f "$services_file" ]; then
     exit 1
 fi
 
-
 # Install required python packages
 echo "[INFO]: Installing packages using pip..."
 pip install -r "$services_file" --ignore-installed 2>/dev/null
 echo "[SUCCESS]: Packages installed successfully."
 
-
 # Get device type
 cat /sys/firmware/devicetree/base/model > "$tool_path/setup_files/device_info"
-
 
 # Get rockyou.txt
 echo "[INFO]: Downloading rockyou.txt.gz..."
@@ -56,7 +49,6 @@ else
     echo "[FAILED]: Download failed, it is recommended to download the rockyou file manually."
 fi
 
-
 # Get and install LoAP and util_pkt_logger services
 echo "[INFO]: Configuring the LoAP service..."
 mkdir /opt/lorafiit_forwarder/
@@ -73,12 +65,10 @@ echo "[INFO]: Configuring the util_pkt_logger tool..."
 cd /opt/lorafiit_forwarder/lora_gateway/
 make
 
-
 # Service alias
 touch /usr/local/bin/vulnelora
 chmod +x /usr/local/bin/vulnelora
 echo -ne '#!/bin/bash\npython3 /opt/vulnelora/vulnelora_main.py "$@"' > /usr/local/bin/vulnelora
-
 
 # Service installation result check
 file_path="/usr/local/bin/vulnelora"
@@ -102,7 +92,6 @@ else
 	fi
 	err_flag=1
 fi
-
 
 if [ "$err_flag" -eq 0 ]; then
 	echo "[SUCCESS]: VulneLora installed successfully!"
