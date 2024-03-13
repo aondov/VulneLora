@@ -85,7 +85,8 @@ The device which will be using the VulneLora tool needs to be compatible with fo
 - currently supported attacks include:
     - **Direct SQL injection** - perform the SQLi attack on a specific LoNES [4] network server or LoAP [5] access point
     - **End device SQL injection** - perform the SQLi attack on a specific LoNES [4] network server by uploading a malicious payload to a registered end device
-    - **DoS - ARP spoofing** - perform the ARP spoofing attack on a specific network device in the infrastructure
+    - **DoS - ARP spoofing** - perform the ARP spoofing attack on a specific network device in the infrastructure (VulneLora must be ran as **SUDO** to perform this attack)
+    - **DoS - SETR flood** - send a large amount of SETR messages to flood a network server and possibly perform DoS on it
     - **Eavesdropping** - capture packets flowing through the access point on which the VulneLora is running on
     - **PSK extraction** - extract the PSK value from network server or AP to allow registering of your own end device
     - **Replay attack** - capture register packets flowing through the access point and use data from them to allow your own end device to communicate
@@ -102,7 +103,7 @@ The device which will be using the VulneLora tool needs to be compatible with fo
 - [ ] test the attacks, evaluate their results
 - [x] add description for required packages to README (packet_converter, util_pkt_logger, etc.)
 - [x] add disclaimer
-- [ ] check if help messages correspond with actual attacks
+- [x] check if help messages correspond with actual attacks
 
 <br>
 
