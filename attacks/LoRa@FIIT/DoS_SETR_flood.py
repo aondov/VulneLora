@@ -9,15 +9,14 @@ import subprocess
 
 save_flag = 0
 service_path = "/opt/vulnelora"
-lomab_dir = f"{service_path}/resources/LoMAB"
+sim_path = f"{service_path}/resources/lora-ap-sim/src"
 
 
-attack_config = {'command': "",
-'db_ip': "127.0.0.1",
-'db_port': 5432,
-'db_name': 'postgres',
-'db_user': 'postgres',
-'db_pass': 'postgres'
+attack_config = {'target_ip': "127.0.0.1",
+'target_port': 8002,
+'ap_id': "9999",
+'limit': 200000,
+'delay': 0
 }
 
 
@@ -78,6 +77,34 @@ def validate_ip(ip):
     return False
 
 
+def replace_line(file_path, search_string, replace_string):
+    with open(file_path, 'r') as file:
+        lines = file.readlines()
+
+    found = False
+    for i, line in enumerate(lines):
+        if search_string in line:
+            lines[i+1] = replace_string + '\n'
+            found = True
+            break
+
+    if found:
+        with open(file_path, 'w') as file:
+            file.writelines(lines)
+    else:
+        print("[ERROR]: Could not change the specified parameter. Try again, please.")
+
+
+def reset_dos():
+    replace_line(f"{sim_path}/run_dos.py", '# server_conf_point', '    conn.connect(\"127.0.0.1\", 8002)')
+    replace_line(f"{sim_path}/run_dos.py", '# ap_id_conf_point', '    ap_id = str(random.randint(1000, 9999))')
+
+
+def configure_dos():
+    replace_line(f'{sim_path}/run_dos.py', '# server_conf_point', f"    conn.connect(\"{attack_config['target_ip']}\", {attack_config['target_port']})")
+    replace_line(f'{sim_path}/run_dos.py', '# ap_id_conf_point', f"    ap_id = \"{attack_config['ap_id']}\"")
+
+
 def argument_parser():
     argument = sys.argv[1]
     base_name, extension = os.path.splitext(argument)
@@ -87,57 +114,58 @@ def argument_parser():
         arg_input = input()
 
         if arg_input == "help":
-            with open(service_path + '/modes/help_messages/direct_sql_injection.txt', 'r') as file:
+            with open(service_path + '/modes/help_messages/dos_setr_flood.txt', 'r') as file:
                 file_content = file.read()
                 print(file_content)
-        elif "command" in arg_input:
-            tmp_payload = extract(arg_input, "command")
-            attack_config['command'] = tmp_payload
-            print(f"\n>> Set argument: command={tmp_payload}")
-        elif "db_ip" in arg_input:
-            tmp_ip = extract(arg_input, "db_ip")
-            if validate_ip(tmp_ip):
-                attack_config['db_ip'] = tmp_ip
-                print(f"\n>> Set argument: db_ip={tmp_ip}")
+        elif "target_ip" in arg_input:
+            tmp_t_ip = extract(arg_input, "target_ip")
+            if validate_ip(tmp_t_ip):
+                attack_config['target_ip'] = tmp_t_ip
+                print(f"\n>> Set argument: target_ip={tmp_t_ip}")
             else:
-                attack_config['db_ip'] = "127.0.0.1"
-                print("\n>> Set argument: db_ip='127.0.0.1' (default value, must be a valid IP address)")
-        elif "db_port" in arg_input:
-            tmp_port = extract(arg_input, "db_port")
+                attack_config['target_ip'] = "127.0.0.1"
+                print("\n>> Set argument: target_ip=127.0.0.1 (revert to default value, must be a valid IP address)")
+        elif "target_port" in arg_input:
+            tmp_port = extract(arg_input, "target_port")
             try:
-                int_tmp_port = int(tmp_port)
-                if 1 <= int_tmp_port <= 65535:
-                    attack_config['db_port'] = tmp_port
-                    print(f"\n>> Set argument: db_port={tmp_port}")
+                if 1 <= int(tmp_port) <= 65535:
+                    attack_config['target_port'] = int(tmp_port)
+                    print(f"\n>> Set argument: target_port={tmp_port}")
                 else:
                     raise ValueError()
             except ValueError:
-                attack_config['db_port'] = 5432
-                print("\n>> Set argument: db_port=5432 (revert to default value, database port must be from 1 to 65535)")
-        elif "db_name" in arg_input:
-            tmp_name = extract(arg_input, "db_name")
-            if len(tmp_name) > 0:
-                attack_config['db_name'] = tmp_name
-                print(f"\n>> Set argument: db_name={tmp_name}")
+                    attack_config['target_port'] = 8002
+                    print("\n>> Set argument: target_port=8002 (revert to default value, target port must have a value from 1 to 65535)")
+        elif "ap_id" in arg_input:
+            tmp_id = extract(arg_input, "ap_id")
+            if 1 <= len(tmp_id) <= 6:
+                attack_config['ap_id'] = tmp_id
+                print(f"\n>> Set argument: ap_id={tmp_id}")
             else:
-                attack_config['db_name'] = "postgres"
-                print("\n>> Set argument: db_name=postgres (revert to default value, database name is mandatory)")
-        elif "db_user" in arg_input:
-            tmp_user = extract(arg_input, "db_user")
-            if len(tmp_user) > 0:
-                attack_config['db_user'] = tmp_user
-                print(f"\n>> Set argument: db_user={tmp_user}")
-            else:
-                attack_config['db_user'] = "postgres"
-                print("\n>> Set argument: db_user=postgres (revert to default value, database username is mandatory)")
-        elif "db_pass" in arg_input:
-            tmp_pass = extract(arg_input, "db_pass")
-            if len(tmp_pass) > 0:
-                attack_config['db_pass'] = tmp_pass
-                print(f"\n>> Set argument: db_pass={tmp_pass}")
-            else:
-                attack_config['db_pass'] = "postgres"
-                print("\n>> Set argument: db_pass=postgres (default value, database password is mandatory)")
+                attack_config['ap_id'] = "9999"
+                print("\n>> Set argument: ap_id='9999' (revert to default value, AP ID must have a length between 1 and 6 numbers)")
+        elif "limit" in arg_input:
+            tmp_limit = extract(arg_input, "limit")
+            try:
+                if 1 <= int(tmp_limit) <= 500000:
+                    attack_config['limit'] = int(tmp_limit)
+                    print(f"\n>> Set argument: limit={tmp_limit}")
+                else:
+                    raise ValueError()
+            except ValueError:
+                attack_config['limit'] = 200000
+                print("\n>> Set argument: limit=200000 (revert to default value, limit must have a value from 1 to 500000)")
+        elif "delay" in arg_input:
+            tmp_delay = extract(arg_input, "delay")
+            try:
+                if 0 <= int(tmp_delay) <= 10:
+                    attack_config['delay'] = int(tmp_delay)
+                    print(f"\n>> Set argument: delay={tmp_delay}")
+                else:
+                    raise ValueError()
+            except ValueError:
+                attack_config['delay'] = 0
+                print("\n>> Set argument: delay=0 (revert to default value, delay must have a value from 0 to 10)")
         elif arg_input == "print":
             print("\n>> Current argument configuration:")
             print_args()
@@ -183,17 +211,15 @@ def argument_parser():
             print(f"\n[ERROR]: Unknown argument '{arg_input}'. Type 'help' to see the supported arguments.")
 
 
-def run_attack():
-    print("\n[INFO]: Starting the SQL injection attack...\n")
 
-    if attack_config['command'] != "":
-        subprocess.run(["psql", f"postgresql://{attack_config['db_user']}:{attack_config['db_pass']}@{attack_config['db_ip']}:{attack_config['db_port']}/{attack_config['db_name']}", "-c", attack_config['command']])
-    else:
-        subprocess.run(["psql", f"postgresql://{attack_config['db_user']}:{attack_config['db_pass']}@{attack_config['db_ip']}:{attack_config['db_port']}/{attack_config['db_name']}"])
+def run_attack():
+    configure_dos()
+    subprocess.run(["python3", f"{service_path}/resources/lora-ap-sim/src/run_dos.py", f"{attack_config['delay']}", f"{attack_config['limit']}"])
 
 
 if __name__ == "__main__":
     try:
+        reset_dos()
         argument_parser()
         run_attack()
     except KeyboardInterrupt:
