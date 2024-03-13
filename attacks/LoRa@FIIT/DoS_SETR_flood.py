@@ -16,7 +16,7 @@ attack_config = {'target_ip': "127.0.0.1",
 'target_port': 8002,
 'ap_id': "9999",
 'limit': 200000,
-'delay': 0
+'delay': 500
 }
 
 
@@ -158,7 +158,7 @@ def argument_parser():
         elif "delay" in arg_input:
             tmp_delay = extract(arg_input, "delay")
             try:
-                if 0 <= int(tmp_delay) <= 10:
+                if 0 <= int(tmp_delay) <= 10000:
                     attack_config['delay'] = int(tmp_delay)
                     print(f"\n>> Set argument: delay={tmp_delay}")
                 else:
