@@ -4,6 +4,7 @@ import argparse
 import subprocess
 import sys
 import os
+import shutil
 
 
 local_path = "/opt/vulnelora"
@@ -11,6 +12,13 @@ local_path = "/opt/vulnelora"
 
 def print_line():
 	print(50*'_'+'\n')
+
+
+def path_exists(tech, file_name):
+	if os.path.exists(f"{local_path}/attacks/{tech}"):
+		if os.path.exists(f"{local_path}/attacks/{tech}/{file_name}.py"):
+			return os.path.getsize(f"{local_path}/attacks/{tech}/{file_name}.py") > 0
+	return False
 
 
 def argument_parser(help_only):
@@ -27,7 +35,7 @@ def argument_parser(help_only):
 	# Add arguments
 	group.add_argument('-I', action='store_true', help='Run VulneLora in the interactive mode')
 	group.add_argument('-S', action='store_true', help='Run VulneLora in the simulated mode')
-
+	group.add_argument('-a', action='store_true', help='Add a new attack to VulneLora')
 	parser.add_argument('-run', nargs='?', help=argparse.SUPPRESS)
 
 	if help_only:
@@ -52,6 +60,16 @@ def argument_parser(help_only):
 					subprocess.run(command, shell=True)
 				else:
 					subprocess.run(['python3', local_path + '/modes/vulnelora_simulation.py'])
+			if args.a:
+				technology = input("Enter the name of the technology: ")
+				name = input("Enter the name of your attack: ")
+				if not path_exists(technology, name):
+					os.makedirs(f"{local_path}/attacks/{technology}")
+					shutil.copyfile(f"{local_path}/resources/script_wizard/template.py", f"{local_path}/attacks/{technology}/{name}.py")
+					subprocess.run(["nano", f"{local_path}/attacks/{technology}/{name}.py"])
+				else:
+					print(f"[ERROR]: Attack '{name}' already exists. Please, EDIT or REMOVE the existing one to proceed.")
+					exit(1)
 			if unknown_args:
 				print(f"Error: Unrecognized argument(s): {' '.join(unknown_args)}\n")
 		except KeyboardInterrupt:

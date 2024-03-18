@@ -1,0 +1,28 @@
+
+
+	[COMMAND]			[DESCRIPTION]
+
+	* target_ip <ip>  ----------->  Set IP address of a target host (default is 127.0.0.1)
+
+	* target_port <port>  ------->  Set port on which target host has network server (default is 8002)
+
+	ap_id <string>  ------------->  Set AP ID which should be in the SETR messages (default is 9999)
+
+	limit <int>  ---------------->  Set limit to the amount of SETR messages to be send (default is 200000)
+
+	delay <int>  ---------------->  Set delay between sent SETR messages in MILLISECONDS (default is 0 -> no delay)
+
+	save <path>  ---------------->	Save current attack configuration to a specified path (including file name!)
+	
+	load <path>  ---------------->	Load attack configuration from a specified path (including file name!)
+	
+	print  ---------------------->	Print current attack configuration
+
+	finish  --------------------->	Finalize and run the attack
+
+	help  ----------------------->	Print this help message
+
+	exit  ----------------------->	Exit VulneLora
+
+
+	[* mandatory]
