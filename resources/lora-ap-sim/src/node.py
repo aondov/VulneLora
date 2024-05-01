@@ -177,7 +177,7 @@ class Node:
         freq = freq
 
 	# payload_conf_point
-        app_data = "Test2"
+        app_data = LoRa.get_data(self.x, self.y)
         time_on_air = LoRa.calculate_time_on_air(len(app_data), sf, band, cr, 1)
 
 	# snr_conf_point

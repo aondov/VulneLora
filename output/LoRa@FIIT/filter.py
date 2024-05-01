@@ -1,5 +1,6 @@
 import pandas as pd
 
+
 def filter(data, config, enable_filtering=True, operator="OR", debug=False):
     if enable_filtering:
         filtered_data = data.copy()
@@ -10,19 +11,17 @@ def filter(data, config, enable_filtering=True, operator="OR", debug=False):
                     if debug:
                         print(f"Skipping {key}")
                     continue
-                if key == "recv_time_from":
+                if key == "recv_time_from" and config["recv_time_from"]:
+                    from_time = pd.to_datetime(value)
                     if "recv_time_to" in config and config["recv_time_to"]:
-                        from_time = pd.to_datetime(value)
                         to_time = pd.to_datetime(config["recv_time_to"])
                         filtered_data['receive_time'] = pd.to_datetime(filtered_data['receive_time'])
                         condition = (filtered_data['receive_time'] >= from_time) & (filtered_data['receive_time'] <= to_time)
                     else:
-                        condition = (pd.to_datetime(filtered_data['receive_time']) >= pd.to_datetime(value))
-                elif key == "recv_time_to":
-                    if "recv_time_from" in config and config["recv_time_from"]:
-                        continue
-                    else:
-                        condition = (pd.to_datetime(filtered_data['receive_time']) <= pd.to_datetime(value))
+                        condition = (pd.to_datetime(filtered_data['receive_time']) >= from_time)
+                elif key == "recv_time_to" and config["recv_time_to"]:
+                    to_time = pd.to_datetime(value)
+                    condition = (pd.to_datetime(filtered_data['receive_time']) <= to_time)
                 else:
                     for val in config[key]:
                         condition = (filtered_data[key] == val)
@@ -46,5 +45,10 @@ def filter(data, config, enable_filtering=True, operator="OR", debug=False):
             except KeyError:
                 continue
 
-        filtered_data = filtered_data[filter_condition]
+        if filter_condition is not None:
+            filtered_data = filtered_data[filter_condition]
+
         return filtered_data
+
+    else:
+        return data

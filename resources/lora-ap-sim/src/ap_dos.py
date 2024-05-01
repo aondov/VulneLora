@@ -1,5 +1,6 @@
 import json
 import time
+import random
 from datetime import timedelta
 
 from lora import NET_CONFIG
@@ -33,7 +34,7 @@ class AccessPoint:
         lora_stand = {}
 
         message['message_name'] = MessageType.SETR.value
-        message_body['id'] = self.hw_id
+        message_body['id'] = random.randint(10000, 99999)
         message_body['ver'] = LORA_VERSION
         message_body['m_chan'] = True
         message_body['channels'] = 8
@@ -54,7 +55,6 @@ class AccessPoint:
 
     def send_setr_dos(self):
         send_counter = 0
-        setr_message = self.generate_setr()
         start_time = time.time()
         print_limit = int(self.limit) // 4
 
@@ -62,6 +62,7 @@ class AccessPoint:
             print_limit = 1
 
         while True:
+            setr_message = self.generate_setr()
             self.conn.send_data(setr_message)
             send_counter += 1
             if send_counter % print_limit == 0:

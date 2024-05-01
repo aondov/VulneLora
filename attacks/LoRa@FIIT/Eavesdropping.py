@@ -174,7 +174,7 @@ def analyze_logs():
 
         print(f"\n[SUCCESS]: Analyzed data saved successfully in '{a_logfile}'!")
 
-    os.remove(log_path)
+    # os.remove(log_file)
 
 
 def detect_service():

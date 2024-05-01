@@ -2,3 +2,4 @@ paramiko
 platformio
 netifaces
 pythonping
+scapy
