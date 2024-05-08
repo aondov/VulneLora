@@ -135,11 +135,20 @@ Make sure your network server IP and port are set correctly in the configuration
 ```
 Save the file and restart the *packet_converter* service afterwards.
 
+- **ISSUE 3**: *packet_converter* service outputs this error:
+
+```
+lgw_start:905: ERROR: CALIBRATION FAILURE (STATUS = 0)
+ERROR: [main] failed to start the concentrator"
+```
+In this case, it is required to stop the *packet_converter* service, reset the board using a script in "*<srv_path>*/lorafiit_forwarder/PacketConverter/**board_reset.sh**", and start the service again.
+Unfortunately, this error is persistent and sometimes requires to repeat this process several times, until it starts functioning correctly.
+
 <br>
 
 ## TODO
 - [ ] code refactoring
-- [ ] correct functionality review
+- [x] correct functionality review
 
 <br>
 
