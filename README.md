@@ -96,6 +96,23 @@ The device which will be using the VulneLora tool needs to be compatible with fo
 
 <br>
 
+## Possible issues
+
+1. *packet_converter* service outputs error "Error checking certificate" - Inside the connection handler source code in Packet Converter service ("*<srv_path>*/lorafiit_forwarder/PacketConverter/src/ConnectionController.cpp"), comment out the following code (should start at **line 61**):
+
+```
+if(SSL_get_verify_result(ssl) != X509_V_OK)
+{
+    std::cerr << "Error checking certificate" << std::endl;
+    BIO_free_all(bio);
+    SSL_CTX_free(ctx);
+    return -1;
+}
+```
+2. *packet_converter* service outputs error "Problem starting network communication" - Make sure your network server IP and port are set correctly in the configuration file of the service. The configuration file is located in "*<srv_path>*/lorafiit_forwarder/PacketConverter/**config.json**"
+
+<br>
+
 ## TODO
 - [ ] code refactoring
 - [ ] correct functionality review
