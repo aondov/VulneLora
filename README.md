@@ -53,7 +53,7 @@ VulneLora can be started using following command (and its arguments):
 
 vulnelora [-h] [ -I | -S | -a]
 
-Optional arguments:
+Supported arguments:
 - **-h, --help** - Show help message
 - **-I** - Run VulneLora in the interactive mode - choose the attack, configure it and run the exploit
 - **-S** - Run VulneLora in the simulation mode - configure your own LoRa@FIIT simulation (1 AP and 1-500 end nodes) and test your own scenarios
