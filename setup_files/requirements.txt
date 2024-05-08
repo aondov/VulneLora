@@ -3,3 +3,8 @@ platformio
 netifaces
 pythonping
 notebook
+numpy
+pandas
+matplotlib
+statistics
+ipython

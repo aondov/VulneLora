@@ -6,7 +6,7 @@ if [ "$(id -u)" != "0" ]; then
     exit 1
 fi
 
-echo -ne "\nStarting VulneLora installation...\n\n"
+echo -ne "\nStarting VulneLora installation (this may take a while)...\n\n"
 
 # Default vulnelora tool path
 tool_path="/opt/vulnelora"
