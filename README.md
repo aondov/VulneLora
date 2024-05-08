@@ -14,7 +14,7 @@ Installation process of VulneLora is automatized and requires only a few steps t
 Firstly, install required packages:
 ```
 sudo apt update
-sudo apt install git python3 postgresql-client dsniff
+sudo apt install git python3 postgresql-client dsniff sshpass
 ```
 
 Create a directory in "/opt" and set the owner of this directory to the current user:
