@@ -29,7 +29,7 @@ echo "[SUCCESS]: Packages installed successfully."
 cat /sys/firmware/devicetree/base/model > "$tool_path/setup_files/device_info"
 
 # Get rockyou.txt
-echo "[INFO]: Downloading rockyou.txt.gz..."
+echo "[INFO]: Downloading rockyou.txt..."
 wget -O "$tool_path/resources/rockyou.txt" https://github.com/brannondorsey/naive-hashcat/releases/download/data/rockyou.txt
 
 if [ $? -eq 0 ]; then
@@ -52,7 +52,7 @@ cd /opt/lorafiit_forwarder/PacketConverter/
 
 echo "[INFO]: Configuring the util_pkt_logger tool..."
 cd /opt/lorafiit_forwarder/lora_gateway/
-make
+make 2>/dev/null
 
 # Service alias
 touch /usr/local/bin/vulnelora
