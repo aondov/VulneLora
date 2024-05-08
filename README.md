@@ -139,10 +139,10 @@ Save the file and restart the *packet_converter* service afterwards.
 
 ```
 lgw_start:905: ERROR: CALIBRATION FAILURE (STATUS = 0)
-ERROR: [main] failed to start the concentrator"
+ERROR: [main] failed to start the concentrator
 ```
 In this case, it is required to stop the *packet_converter* service, reset the board using a script in "*<srv_path>*/lorafiit_forwarder/PacketConverter/**board_reset.sh**", and start the service again.
-Unfortunately, this error is persistent and sometimes requires to repeat this process several times, until it starts functioning correctly.
+Unfortunately, this error is persistent and sometimes requires to repeat this process several times until it starts functioning correctly. A **device reboot** may help as well.
 
 <br>
 
