@@ -45,6 +45,8 @@ cd /opt/lorafiit_forwarder/
 git clone https://github.com/loraalex/LoAP.git
 mv /opt/lorafiit_forwarder/LoAP/* /opt/lorafiit_forwarder
 rm -rf /opt/lorafiit_forwarder/LoAP/
+cp /opt/vulnelora/resources/LoMAB/install.sh /opt/lorafiit_forwarder/PacketConverter/
+rm /opt/vulnelora/resources/LoMAB/install.sh
 cd /opt/lorafiit_forwarder/PacketConverter/
 ./install.sh
 ./install.sh daemon
