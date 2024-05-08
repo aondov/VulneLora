@@ -51,12 +51,13 @@ If the installation process is successful, the script will notify you and you ca
 ## Usage
 VulneLora can be started using following command (and its arguments):
 
-vulnelora [-h] [ -I | -S ]
+vulnelora [-h] [ -I | -S | -a]
 
 Optional arguments:
 - **-h, --help** - Show help message
 - **-I** - Run VulneLora in the interactive mode - choose the attack, configure it and run the exploit
 - **-S** - Run VulneLora in the simulation mode - configure your own LoRa@FIIT simulation (1 AP and 1-500 end nodes) and test your own scenarios
+- **-a** - Add new script for a custom attack
 
 <br>
 
@@ -91,19 +92,13 @@ The device which will be using the VulneLora tool needs to be compatible with fo
     - **PSK extraction** - extract the PSK value from network server or AP to allow registering of your own end device
     - **Replay attack** - capture register packets flowing through the access point and use data from them to allow your own end device to communicate
     - **SSH exploit** - perform a dictionary brute-force attack on the SSH service located on a network server or access point 
+- **custom attack script template** - users can add their own attack for a specific IoT technology and/or protocol by using a template script, which adheres to the pre-defined format of other attack scripts
 
 <br>
 
 ## TODO
-- [x] code interactive mode and test it
-- [x] integrate *lora-ap-sim* [1] to VulneLora
-- [x] implement the attacks on LoRa@FIIT, regardless of the startup mode
-- [x] implement the PoC attack on LoRaWAN
-- [ ] create testing scenarios (acceptance tests)
-- [ ] test the attacks, evaluate their results
-- [x] add description for required packages to README (packet_converter, util_pkt_logger, etc.)
-- [x] add disclaimer
-- [x] check if help messages correspond with actual attacks
+- [ ] code refactoring
+- [ ] correct functionality review
 
 <br>
 

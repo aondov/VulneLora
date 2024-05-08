@@ -14,7 +14,7 @@ service_path = "/opt/vulnelora"
 attack_config = {'target_ip': "127.0.0.1",
 'target_port': 22,
 'filename': ".env",
-'ssh_creds_path': "/opt/vulnelora/resources/creds/ssh_creds.txt",
+'ssh_creds_path': "./ssh_creds.txt",
 'try_sudo': True,
 'print_full': False
 }

@@ -15,7 +15,7 @@ ap_id = "123456"
 
 
 attack_config = {'target_ip': "127.0.0.1",
-'target_port': 8002,
+'target_port': 25001,
 'payload': "",
 'print_all': False
 }

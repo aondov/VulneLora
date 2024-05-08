@@ -12,10 +12,10 @@ save_flag = 0
 
 
 args = {'target_ip':"127.0.0.1",
-'target_port':8002,
-'register':0,
+'target_port':25001,
+'register': False,
 'ap_id':"111111",
-'shuffle':0,
+'shuffle': False,
 'nodes':1,
 'node_path':"",
 'node_conf':{
@@ -133,7 +133,7 @@ def node_conf_validator(conf_type, value):
 	if conf_type == "rssi":
 		return -120 <= int(value) < 0
 	elif conf_type == "snr":
-		return -20 <= int(value) <= 10
+		return -20 <= int(value) <= 15
 	elif conf_type == "freq":
 		pattern = re.compile(r'^86[6-8]\.\d{1,1}$')
 		if pattern.match(value):
@@ -366,9 +366,9 @@ def generate_sim_command():
 
 	final_command = f"vulnelora -S -run \"-i {args['ap_id']}"
 
-	if args['register'] == 1:
+	if args['register'] == True:
 		final_command = final_command + " -r"
-	if args['shuffle'] == 1:
+	if args['shuffle'] == True:
 		final_command = final_command + " -s"
 	if args['node_path'] != "":
 		final_command = final_command + f" -f {args['node_path']}"

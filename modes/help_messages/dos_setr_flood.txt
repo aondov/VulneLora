@@ -4,13 +4,13 @@
 
 	* target_ip <ip>  ----------->  Set IP address of a target host (default is 127.0.0.1)
 
-	* target_port <port>  ------->  Set port on which target host has network server (default is 8002)
+	* target_port <port>  ------->  Set port on which target host has network server (default is 25001)
 
 	ap_id <string>  ------------->  Set AP ID which should be in the SETR messages (default is 9999)
 
 	limit <int>  ---------------->  Set limit to the amount of SETR messages to be send (default is 200000)
 
-	delay <int>  ---------------->  Set delay between sent SETR messages in MILLISECONDS (default is 0 -> no delay)
+	delay <int>  ---------------->  Set delay between sent SETR messages in MILLISECONDS (default is 500)
 
 	save <path>  ---------------->	Save current attack configuration to a specified path (including file name!)
 	

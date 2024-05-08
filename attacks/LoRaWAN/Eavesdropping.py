@@ -11,9 +11,9 @@ pkt_logger_path = f"{service_path}/resources/lora_gateway/util_pkt_logger"
 
 
 attack_config = {'save_capture': False,
-'capture_path': "./lorawan_vulnelora_capture.log",
+'capture_path': "./lw_capture.log",
 'save_analysis': False,
-'analysis_path': "./lorawan_vulnelora_analysis.log"
+'analysis_path': "./lw_analysis.log"
 }
 
 

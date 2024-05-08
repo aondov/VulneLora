@@ -4,10 +4,12 @@
 
 	* target_ip <ip>  ----------->  Set IP address of a target (default is 127.0.0.1)
 
-	* target_port <port>  ------->  Set port of a target (default is 8002)
+	* target_port <port>  ------->  Set port of a target (default is 25001)
 
 	payload <string>  ----------->  Set payload of the end device, including the SQL injection command (must be less than 255 characters!)
 	
+	simulate [true|false]  ------>  Flag to switch between simulating an end device, or uploading the firmware to an actual end device
+
         save <path>  ---------------->	Save current attack configuration to a specified path (including file name!)
 	
 	load <path>  ---------------->	Load attack configuration from a specified path (including file name!)

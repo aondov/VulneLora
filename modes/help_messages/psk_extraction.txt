@@ -2,13 +2,13 @@
 
 	[COMMAND]			 [DESCRIPTION]
 
-	* target_ip <ip>  ----------->  Set IP address of a target host
+	* target_ip <ip>  ----------->  Set IP address of a target host (default is 127.0.0.1)
 
         * target_port <port>  ------->  Set port of a target host (default is 22)
 
-	* filename <string>  -------->  Set a filename to look for on a target host
+	* filename <string>  -------->  Set a filename to look for on a target host (default is .env)
 
-	* ssh_creds_path <path>  ---->  Set path to a credentials discovered with SSH exploit attack
+	* ssh_creds_path <path>  ---->  Set path to a credentials discovered with SSH exploit attack (default is ./ssh_creds.txt)
 
 	try_sudo [true|false]  ------>  Enable/disable searching for a specified file as sudo
 

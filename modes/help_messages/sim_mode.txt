@@ -4,17 +4,17 @@
 
 	* target_ip <ip>  ----------->	Set IP address of a network server (default is 127.0.0.1)
 
-	* target_port <port>  ------->	Set port of a network server (default is 8002)
+	* target_port <port>  ------->	Set port of a network server (default is 25001)
 
 	register [true|false]  ------>	Enable/disable end node register process
 
 	shuffle [true|false]  ------->	Enable/disable end node ID shuffle before start
 
-	ap_id <hex>  ---------------->	Set custom hardware ID for AP (default is 111111) - Allowed only hexadecimal characters
+	ap_id <hex>  ---------------->	Set custom hardware ID for AP - Allowed only hexadecimal characters (default is 111111)
 
 	nodes <amount>  ------------->	Set the amount of end nodes to be generated (default is 1, max. 500)
 
-	node_path <path>  ----------->	Set path to custom LoRa node ID file (default is "") - Allowed only existing and non-empty files
+	node_path <path>  ----------->	Set path to custom LoRa node ID file - Allowed only existing and non-empty files
 
 	node_conf <parameter> <value>	Set custom values to different LoRa communication parameters
 					
@@ -23,7 +23,7 @@
 					
 					rssi  ------->	< -120 ; -1 > dB
 
-					snr  -------->	< -20 ; 10 > dB
+					snr  -------->	< -20 ; 15 > dB
 
 					sf  --------->	[7, 8, 9, 10, 11, 12]
 

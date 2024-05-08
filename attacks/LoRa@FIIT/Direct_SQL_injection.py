@@ -14,10 +14,10 @@ lomab_dir = f"{service_path}/resources/LoMAB"
 
 attack_config = {'command': "",
 'db_ip': "127.0.0.1",
-'db_port': 5432,
+'db_port': 5001,
 'db_name': 'postgres',
-'db_user': 'postgres',
-'db_pass': 'postgres'
+'db_user': 'admin',
+'db_pass': 'admin'
 }
 
 

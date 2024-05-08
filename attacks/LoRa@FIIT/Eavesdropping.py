@@ -11,9 +11,9 @@ service_path = "/opt/vulnelora"
 
 
 attack_config = {'save_capture': False,
-'capture_path': "./vulnelora_capture.log",
+'capture_path': "./capture.log",
 'save_analysis': False,
-'analysis_path': "./vulnelora_analysis.log"
+'analysis_path': "./analysis.log"
 }
 
 

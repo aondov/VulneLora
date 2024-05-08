@@ -14,7 +14,7 @@ sim_path = f"{service_path}/resources/lora-ap-sim/src"
 
 
 attack_config = {'target_ip': "127.0.0.1",
-'target_port': 8002,
+'target_port': 25001,
 'payload': "",
 'simulate': False
 }

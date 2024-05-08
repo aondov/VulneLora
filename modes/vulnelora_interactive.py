@@ -72,6 +72,5 @@ with open(service_path + '/modes/intro_messages/interactive_mode.txt', 'r') as f
 try:
     main()
 except KeyboardInterrupt:
-    pass
-#    print("\n\n[INFO]: VulneLora forced to quit by keyboard interrupt. Bye Bye!\n")
-#    exit(0)
+    print("\n\n[INFO]: VulneLora forced to quit by keyboard interrupt. Bye Bye!\n")
+    exit(0)
