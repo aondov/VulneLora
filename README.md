@@ -98,8 +98,9 @@ The device which will be using the VulneLora tool needs to be compatible with fo
 
 ## Possible issues
 
-1. *packet_converter* service outputs error "Error checking certificate" - Inside the connection handler source code in Packet Converter service ("*<srv_path>*/lorafiit_forwarder/PacketConverter/src/ConnectionController.cpp"), comment out the following code (should start at **line 61**):
-
+- **ISSUE 1**: *packet_converter* service outputs "**Error checking certificate**"
+  
+Inside the connection handler source code in Packet Converter service ("*<srv_path>*/lorafiit_forwarder/PacketConverter/src/ConnectionController.cpp"), comment out the following code (should start at **line 61**):
 ```
 if(SSL_get_verify_result(ssl) != X509_V_OK)
 {
@@ -109,7 +110,30 @@ if(SSL_get_verify_result(ssl) != X509_V_OK)
     return -1;
 }
 ```
-2. *packet_converter* service outputs error "Problem starting network communication" - Make sure your network server IP and port are set correctly in the configuration file of the service. The configuration file is located in "*<srv_path>*/lorafiit_forwarder/PacketConverter/**config.json**"
+Don't forget to re-build the source code again by running the "**install.sh**" script in the same directory as **sudo**
+
+- **ISSUE 2**: *packet_converter* service outputs "**Problem starting network communication**"
+
+Make sure your network server IP and port are set correctly in the configuration file of the service. The configuration file is located in "*<srv_path>*/lorafiit_forwarder/PacketConverter/**config.json**"
+
+```
+"conf": {
+    "lorawan_public": false,
+    "clksrc": 1,
+    "radio_0": {
+        "type": "SX1257",
+        "tx_enable": true
+    },
+    "radio_1": {
+        "type": "SX1257",
+        "tx_enable": true
+    },
+    "if_chain": 5,
+    "rssi_offset": -166.0,
+    "server_address": "<server_ip>:<server_port>"
+}
+```
+Save the file and restart the *packet_converter* service afterwards.
 
 <br>
 
