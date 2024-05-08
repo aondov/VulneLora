@@ -87,6 +87,8 @@ fi
 
 if [ "$err_flag" -eq 0 ]; then
 	echo "[SUCCESS]: VulneLora installed successfully!"
+	echo
+	echo "[IMPORTANT]: Don't forget to configure the access point in '/opt/lorafiit_forwarder/PacketConverter/config.json' !"
 	exit 0
 else
 	echo "[FAILED]: VulneLora installation encountered some errors. Try to re-run this script."
