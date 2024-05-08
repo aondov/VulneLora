@@ -1,5 +1,16 @@
 #!/bin/bash
 
+
+# [DISCLAIMER]: Use this script only if necessary, as it completely restarts the whole LoNES database and erases the data!
+
+
+read -sp "Restart the LoNES database completely? [y/N]" answer
+
+if ! [[ "$answer" =~ ^[yY]$ ]]; then
+    echo "[INFO]: Database restart aborted"
+    exit 1
+fi
+
 read -sp "LoNES IP address: " ip
 echo
 read -sp "LoNES SSH password: " pwd
