@@ -1,12 +1,10 @@
 #!/bin/bash
 
-read -sp "Input LoNES IP address: " ip
+read -p "Input LoNES IP address: " ip
+read -p "Input LoNES SSH password: " pwd
 echo
-read -sp "Input LoNES SSH password: " pwd
 echo
-echo
-read -sp "Input gateway IP address: " ip_ap
-echo
+read -p "Input gateway IP address: " ip_ap
 read -sp "Input gateway SSH password: " pwd_ap
 echo
 
